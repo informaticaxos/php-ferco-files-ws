@@ -1,6 +1,6 @@
 <?php
 
-define('BASE_URL', 'http://localhost/git/');
+define('BASE_URL', 'https://fercoadvancededucation.com/');
 
 require_once __DIR__ . '/../services/DocumentsService.php';
 
