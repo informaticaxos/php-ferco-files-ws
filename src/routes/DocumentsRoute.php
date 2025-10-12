@@ -7,9 +7,9 @@
 
 // Definición de rutas REST para Documents
 $routes = [
-    'GET /documents' => ['DocumentsController', 'getAll'],
-    'POST /documents' => ['DocumentsController', 'create'],
-    'POST /documents/upload/{id}' => ['DocumentsController', 'uploadFile'],
-    'DELETE /documents/{id}' => ['DocumentsController', 'delete'],
+    'GET /files' => ['DocumentsController', 'getAll'],
+    'POST /files' => ['DocumentsController', 'create'],
+    'POST /files/upload/{id}' => ['DocumentsController', 'uploadFile'],
+    'DELETE /files/{id}' => ['DocumentsController', 'delete'],
 ];
 
