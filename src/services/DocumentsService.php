@@ -45,17 +45,16 @@ class DocumentsService
      * Crea un nuevo document
      *
      * @param int $pk_form
-     * @param string $title
      * @return Document|null
      */
-    public function createDocument($pk_form, $title)
+    public function createDocument($pk_form)
     {
         // Validación básica
-        if (empty($pk_form) || empty($title)) {
+        if (empty($pk_form)) {
             return null; // Error de validación
         }
 
-        $document = new Document(null, $title, null, null, null, $pk_form);
+        $document = new Document(null, null, null, null, null, $pk_form);
         $this->repository->save($document);
         return $document;
     }
