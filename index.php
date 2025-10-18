@@ -20,7 +20,7 @@ function getRequestMethodAndPath()
     $method = $_SERVER['REQUEST_METHOD'];
     $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     // Remover el prefijo del subdirectorio
-    $path = str_replace('/php-ferco-files-ws/index.php', '', $path);
+    $path = str_replace('/php-ferco-files-ws', '', $path);
     return [$method, $path];
 }
 
