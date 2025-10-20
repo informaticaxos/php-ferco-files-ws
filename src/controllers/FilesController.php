@@ -28,6 +28,25 @@ class FilesController
     }
 
     /**
+     * Crea un nuevo file
+     */
+    public function createFile()
+    {
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!$data) {
+            $this->sendResponse(400, 0, 'Invalid JSON data', null);
+            return;
+        }
+
+        $file = $this->service->createFile($data);
+        if ($file) {
+            $this->sendResponse(201, 1, 'File created successfully', $file->toArray());
+        } else {
+            $this->sendResponse(400, 0, 'Validation error', null);
+        }
+    }
+
+    /**
      * Envía la respuesta HTTP
      *
      * @param int $httpStatus

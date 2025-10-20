@@ -29,4 +29,36 @@ class FilesRepository
         $stmt = $this->pdo->query("SELECT * FROM files");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    /**
+     * Guarda un file (inserta si no tiene ID, actualiza si lo tiene)
+     *
+     * @param Files $file
+     */
+    public function save(Files $file)
+    {
+        if ($file->getIdFile()) {
+            // Actualizar
+            $stmt = $this->pdo->prepare("UPDATE files SET title = ?, description = ?, type = ?, path = ?, fk_form = ? WHERE id_file = ?");
+            $stmt->execute([
+                $file->getTitle(),
+                $file->getDescription(),
+                $file->getType(),
+                $file->getPath(),
+                $file->getFkForm(),
+                $file->getIdFile()
+            ]);
+        } else {
+            // Insertar
+            $stmt = $this->pdo->prepare("INSERT INTO files (title, description, type, path, fk_form) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([
+                $file->getTitle(),
+                $file->getDescription(),
+                $file->getType(),
+                $file->getPath(),
+                $file->getFkForm()
+            ]);
+            $file->setIdFile($this->pdo->lastInsertId());
+        }
+    }
 }

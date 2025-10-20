@@ -8,4 +8,5 @@
 // Definición de rutas REST para Files
 $routes = [
     'GET /files' => ['FilesController', 'getAllFiles'],
+    'POST /files' => ['FilesController', 'createFile'],
 ];
