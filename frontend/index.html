@@ -83,6 +83,31 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal for creating new file -->
+    <div class="modal fade" id="createFileModal" tabindex="-1" aria-labelledby="createFileModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createFileModalLabel">Crear Nuevo Archivo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createFileForm">
+                        <input type="hidden" id="fileFkForm">
+                        <div class="mb-3">
+                            <label for="fileTitle" class="form-label">Título</label>
+                            <input type="text" class="form-control" id="fileTitle" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="saveFile">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
         </div>
     </div>
 
@@ -118,10 +143,11 @@
                     method: 'GET',
                     success: function(response) {
                         if (response.status === 1) {
-                            var table = '<table class="table table-striped"><thead><tr><th>ID</th><th>Nombre</th><th>Fecha</th><th>Estado</th></tr></thead><tbody>';
+                            var table = '<table class="table table-striped"><thead><tr><th>ID</th><th>Nombre</th><th>Fecha</th><th>Estado</th><th>Archivos</th><th>Acciones</th></tr></thead><tbody>';
                             response.data.forEach(function(form) {
                                 var statusText = form.status === 1 ? 'Activo' : 'Inactivo';
-                                table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + statusText + '</td></tr>';
+                                var fileCount = form.file_count || 0; // Assuming the API returns file_count
+                                table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + statusText + '</td><td>' + fileCount + '</td><td><button class="btn btn-info btn-sm me-2" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i></button><button class="btn btn-danger btn-sm" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i></button></td></tr>';
                             });
                             table += '</tbody></table>';
                             $('#formularios-table').html(table);
@@ -183,6 +209,92 @@
                     });
                 }
             });
+
+            // Open create file modal
+            window.openCreateFileModal = function(fkForm) {
+                $('#fileFkForm').val(fkForm);
+                $('#createFileModal').modal('show');
+            };
+
+            // Save new file
+            $('#saveFile').click(function() {
+                var fkForm = $('#fileFkForm').val();
+                var title = $('#fileTitle').val();
+                if (title) {
+                    $.ajax({
+                        url: 'https://fercoadvancededucation.com/php-ferco-files-ws/files',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            fk_form: fkForm,
+                            title: title
+                        }),
+                        success: function(response) {
+                            Swal.fire({
+                                icon: response.status === 1 ? 'success' : 'error',
+                                title: response.status === 1 ? 'Éxito' : 'Error',
+                                text: response.message
+                            });
+                            if (response.status === 1) {
+                                $('#createFileModal').modal('hide');
+                                $('#createFileForm')[0].reset();
+                                loadFormularios(); // Reload the table
+                            }
+                        },
+                        error: function() {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Error de conexión.'
+                            });
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Campos requeridos',
+                        text: 'Por favor, complete el título.'
+                    });
+                }
+            });
+
+            // Delete form
+            window.deleteForm = function(id) {
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: 'Esta acción no se puede deshacer.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: 'https://fercoadvancededucation.com/php-ferco-files-ws/forms/' + id,
+                            method: 'DELETE',
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: response.status === 1 ? 'success' : 'error',
+                                    title: response.status === 1 ? 'Eliminado' : 'Error',
+                                    text: response.message
+                                });
+                                if (response.status === 1) {
+                                    loadFormularios(); // Reload the table
+                                }
+                            },
+                            error: function() {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Error de conexión.'
+                                });
+                            }
+                        });
+                    }
+                });
+            };
         });
     </script>
 </body>
