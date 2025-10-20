@@ -14,6 +14,10 @@
         <div id="form-info" class="mb-4">
             <!-- Información del formulario se cargará aquí -->
         </div>
+
+        <div id="files-list">
+            <!-- Lista de archivos se cargará aquí -->
+        </div>
     </div>
 
     <!-- jQuery -->
@@ -40,6 +44,9 @@
 
             // Cargar información del formulario
             loadFormInfo(idForm);
+
+            // Cargar lista de archivos
+            loadFiles(idForm);
         });
 
         function loadFormInfo(idForm) {
@@ -72,6 +79,55 @@
                 },
                 error: function(xhr) {
                     let errorMessage = 'Error al cargar la información del formulario';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: errorMessage
+                    });
+                }
+            });
+        }
+
+        function loadFiles(idForm) {
+            $.ajax({
+                url: `https://fercoadvancededucation.com/php-ferco-files-ws/files/form/${idForm}`,
+                method: 'GET',
+                success: function(response) {
+                    if (response.status === 1) {
+                        const files = response.data;
+                        let html = '<h4>Archivos del Formulario</h4>';
+
+                        if (files.length === 0) {
+                            html += '<p>No hay archivos asociados a este formulario.</p>';
+                        } else {
+                            files.forEach(file => {
+                                html += `
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <h5 class="card-title">${file.title}</h5>
+                                            <p class="card-text">${file.description || 'Sin descripción'}</p>
+                                            <p class="card-text"><small class="text-muted">Tipo: ${file.type || 'N/A'}</small></p>
+                                            ${file.path ? `<a href="${file.path}" target="_blank" class="btn btn-primary">Ver Archivo</a>` : '<span class="text-warning">Archivo no subido</span>'}
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                        }
+
+                        $('#files-list').html(html);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    let errorMessage = 'Error al cargar los archivos';
                     if (xhr.responseJSON && xhr.responseJSON.message) {
                         errorMessage = xhr.responseJSON.message;
                     }
