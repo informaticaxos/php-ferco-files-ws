@@ -7,4 +7,4 @@
 - [x] Crear src/models/FilesModel.php
 - [x] Modificar index.php para incluir files
 - [x] Verificar archivos creados (todos los archivos de files están presentes)
-- [ ] Probar endpoint GET /files
+- [x] Probar endpoint GET /files (accesible en https://fercoadvancededucation.com/php-ferco-files-ws/files)
