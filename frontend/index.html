@@ -108,6 +108,24 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal for viewing files -->
+    <div class="modal fade" id="viewFilesModal" tabindex="-1" aria-labelledby="viewFilesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewFilesModalLabel">Archivos del Formulario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="files-list"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
         </div>
     </div>
 
@@ -153,10 +171,10 @@
                                     async: false, // Sincronizar para obtener el conteo antes de construir la fila
                                     success: function(fileResponse) {
                                         var fileCount = fileResponse.status === 1 ? fileResponse.data.length : 0;
-                                        table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + statusText + '</td><td>' + fileCount + '</td><td><button class="btn btn-info btn-sm me-2" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i></button><button class="btn btn-danger btn-sm" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i></button></td></tr>';
+                                        table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + statusText + '</td><td>' + fileCount + '</td><td><button class="btn btn-info btn-sm me-1" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i></button><button class="btn btn-secondary btn-sm me-1" onclick="viewFilesModal(' + form.id_form + ')"><i class="fas fa-list"></i></button><button class="btn btn-danger btn-sm" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i></button></td></tr>';
                                     },
                                     error: function() {
-                                        table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + statusText + '</td><td>0</td><td><button class="btn btn-info btn-sm me-2" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i></button><button class="btn btn-danger btn-sm" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i></button></td></tr>';
+                                        table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + statusText + '</td><td>0</td><td><button class="btn btn-info btn-sm me-1" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i></button><button class="btn btn-secondary btn-sm me-1" onclick="viewFilesModal(' + form.id_form + ')"><i class="fas fa-list"></i></button><button class="btn btn-danger btn-sm" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i></button></td></tr>';
                                     }
                                 });
                             });
@@ -268,6 +286,82 @@
                     });
                 }
             });
+
+            // View files modal
+            window.viewFilesModal = function(idForm) {
+                $('#viewFilesModalLabel').text('Archivos del Formulario ID: ' + idForm);
+                $('#files-list').html('<p>Cargando archivos...</p>');
+                $('#viewFilesModal').modal('show');
+
+                $.ajax({
+                    url: 'https://fercoadvancededucation.com/php-ferco-files-ws/files/form/' + idForm,
+                    method: 'GET',
+                    success: function(response) {
+                        if (response.status === 1 && response.data.length > 0) {
+                            var filesHtml = '<div class="list-group">';
+                            response.data.forEach(function(file) {
+                                var fileUrl = file.path ? '<a href="' + file.path + '" target="_blank" class="btn btn-sm btn-outline-primary me-2"><i class="fas fa-download"></i> Descargar</a>' : '';
+                                filesHtml += '<div class="list-group-item d-flex justify-content-between align-items-center">' +
+                                    '<div>' +
+                                        '<strong>' + file.title + '</strong><br>' +
+                                        '<small class="text-muted">Tipo: ' + (file.type || 'N/A') + ' | Descripción: ' + (file.description || 'N/A') + '</small>' +
+                                    '</div>' +
+                                    '<div>' +
+                                        fileUrl +
+                                        '<button class="btn btn-sm btn-outline-danger" onclick="deleteFile(' + file.id_file + ')"><i class="fas fa-trash"></i></button>' +
+                                    '</div>' +
+                                '</div>';
+                            });
+                            filesHtml += '</div>';
+                            $('#files-list').html(filesHtml);
+                        } else {
+                            $('#files-list').html('<p>No hay archivos asociados a este formulario.</p>');
+                        }
+                    },
+                    error: function() {
+                        $('#files-list').html('<p>Error al cargar archivos.</p>');
+                    }
+                });
+            };
+
+            // Delete file
+            window.deleteFile = function(id) {
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: 'Esta acción eliminará el archivo permanentemente.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: 'https://fercoadvancededucation.com/php-ferco-files-ws/files/' + id,
+                            method: 'DELETE',
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: response.status === 1 ? 'success' : 'error',
+                                    title: response.status === 1 ? 'Eliminado' : 'Error',
+                                    text: response.message
+                                });
+                                if (response.status === 1) {
+                                    $('#viewFilesModal').modal('hide');
+                                    loadFormularios(); // Reload the table
+                                }
+                            },
+                            error: function() {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Error de conexión.'
+                                });
+                            }
+                        });
+                    }
+                });
+            };
 
             // Delete form
             window.deleteForm = function(id) {
