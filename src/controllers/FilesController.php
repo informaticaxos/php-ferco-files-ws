@@ -47,6 +47,30 @@ class FilesController
     }
 
     /**
+     * Actualiza un file existente (sube archivo)
+     *
+     * @param int $id
+     */
+    public function updateFile($id)
+    {
+        // Verificar si hay archivo en $_FILES
+        if (!isset($_FILES['file'])) {
+            $this->sendResponse(400, 0, 'No file uploaded', null);
+            return;
+        }
+
+        $file = $_FILES['file'];
+        $description = $_POST['description'] ?? '';
+
+        $updatedFile = $this->service->updateFile($id, $file, $description);
+        if ($updatedFile) {
+            $this->sendResponse(200, 1, 'File updated successfully', $updatedFile->toArray());
+        } else {
+            $this->sendResponse(400, 0, 'Update error', null);
+        }
+    }
+
+    /**
      * Envía la respuesta HTTP
      *
      * @param int $httpStatus

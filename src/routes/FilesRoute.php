@@ -9,4 +9,5 @@
 $routes = [
     'GET /files' => ['FilesController', 'getAllFiles'],
     'POST /files' => ['FilesController', 'createFile'],
+    'PUT /files/{id}' => ['FilesController', 'updateFile'],
 ];

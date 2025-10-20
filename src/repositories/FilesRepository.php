@@ -31,6 +31,19 @@ class FilesRepository
     }
 
     /**
+     * Obtiene un file por ID
+     *
+     * @param int $id
+     * @return array|null
+     */
+    public function findById($id)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM files WHERE id_file = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    /**
      * Guarda un file (inserta si no tiene ID, actualiza si lo tiene)
      *
      * @param Files $file

@@ -46,4 +46,43 @@ class FilesService
         $this->repository->save($file);
         return $file;
     }
+
+    /**
+     * Actualiza un file existente subiendo un archivo
+     *
+     * @param int $id
+     * @param array $uploadedFile
+     * @param string $description
+     * @return Files|null
+     */
+    public function updateFile($id, $uploadedFile, $description)
+    {
+        // Verificar que el archivo existe en BD
+        $existing = $this->repository->findById($id);
+        if (!$existing) {
+            return null;
+        }
+
+        // Generar nombre de archivo: DDMMYYYYHHMMSS.ext
+        $timestamp = date('dmYHis');
+        $extension = pathinfo($uploadedFile['name'], PATHINFO_EXTENSION);
+        $filename = $timestamp . '.' . $extension;
+
+        // Ruta de destino
+        $uploadDir = __DIR__ . '/../../uploaded-files/';
+        $filePath = $uploadDir . $filename;
+
+        // Mover archivo
+        if (!move_uploaded_file($uploadedFile['tmp_name'], $filePath)) {
+            return null;
+        }
+
+        // URL completa
+        $fullUrl = 'https://fercoadvancededucation.com/php-ferco-files-ws/uploaded-files/' . $filename;
+
+        // Actualizar objeto
+        $file = new Files($id, $existing['title'], $description, $extension, $fullUrl, $existing['fk_form']);
+        $this->repository->save($file);
+        return $file;
+    }
 }
