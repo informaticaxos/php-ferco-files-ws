@@ -47,6 +47,15 @@
 
             // Cargar lista de archivos
             loadFiles(idForm);
+
+            // Manejar envío de formularios
+            $(document).on('submit', '.update-file-form', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                const idFile = $(this).data('id-file');
+
+                updateFile(idFile, formData);
+            });
         });
 
         function loadFormInfo(idForm) {
@@ -108,9 +117,18 @@
                                     <div class="card mb-3">
                                         <div class="card-body">
                                             <h5 class="card-title">${file.title}</h5>
-                                            <p class="card-text">${file.description || 'Sin descripción'}</p>
-                                            <p class="card-text"><small class="text-muted">Tipo: ${file.type || 'N/A'}</small></p>
-                                            ${file.path ? `<a href="${file.path}" target="_blank" class="btn btn-primary">Ver Archivo</a>` : '<span class="text-warning">Archivo no subido</span>'}
+                                            <form class="update-file-form" data-id-file="${file.id_file}" enctype="multipart/form-data">
+                                                <div class="mb-3">
+                                                    <label for="description_${file.id_file}" class="form-label">Descripción (opcional)</label>
+                                                    <input type="text" class="form-control" id="description_${file.id_file}" name="description" value="${file.description || ''}">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="file_${file.id_file}" class="form-label">Archivo *</label>
+                                                    <input type="file" class="form-control" id="file_${file.id_file}" name="file" required>
+                                                </div>
+                                                <button type="submit" class="btn btn-primary">Actualizar Archivo</button>
+                                                ${file.path ? `<a href="${file.path}" target="_blank" class="btn btn-secondary ms-2">Ver Archivo Actual</a>` : '<span class="text-warning ms-2">Archivo no subido</span>'}
+                                            </form>
                                         </div>
                                     </div>
                                 `;
@@ -128,6 +146,45 @@
                 },
                 error: function(xhr) {
                     let errorMessage = 'Error al cargar los archivos';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: errorMessage
+                    });
+                }
+            });
+        }
+
+        function updateFile(idFile, formData) {
+            $.ajax({
+                url: `https://fercoadvancededucation.com/php-ferco-files-ws/files/${idFile}`,
+                method: 'PUT',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status === 1) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Éxito',
+                            text: response.message
+                        }).then(() => {
+                            // Recargar la página para actualizar la información
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    let errorMessage = 'Error al actualizar el archivo';
                     if (xhr.responseJSON && xhr.responseJSON.message) {
                         errorMessage = xhr.responseJSON.message;
                     }
