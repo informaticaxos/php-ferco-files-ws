@@ -84,7 +84,9 @@ class FilesController
             $log .= "Archivo actualizado exitosamente\n";
             $this->sendResponse(200, 1, 'File updated successfully', $updatedFile->toArray(), $log);
         } else {
-            $log .= "Error al actualizar el archivo\n";
+            $log .= "Error al actualizar el archivo - Verificando detalles...\n";
+            $log .= "Archivo temporal existe: " . (file_exists($file['tmp_name']) ? 'Sí' : 'No') . "\n";
+            $log .= "Directorio uploaded-files existe: " . (is_dir(__DIR__ . '/../uploaded-files/') ? 'Sí' : 'No') . "\n";
             $this->sendResponse(400, 0, 'Update error', null, $log);
         }
     }
