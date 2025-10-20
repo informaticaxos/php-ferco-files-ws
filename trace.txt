@@ -1,0 +1,25 @@
+﻿
+> => Send data, 365 bytes (0x16d)
+  0000: --------------------------fJeThOGffwGCTMqhu489YP
+  0032: Content-Disposition: form-data; name="file"; 
+filename="test_file
+  0072: .txt"
+  0079: Content-Type: text/plain
+  0093: 
+  0095: ..T.e.s.t. .f.i.l.e. .c.o.n.t.e.n.t.....
+  00bf: --------------------------fJeThOGffwGCTMqhu489YP
+  00f1: Content-Disposition: form-data; name="description"
+  0125: 
+  0127: Test description
+  0139: --------------------------fJeThOGffwGCTMqhu489YP--
+  == Info: upload completely sent off: 365 bytes
+  <= Recv header, 26 bytes (0x1a)
+  0000: HTTP/1.1 400 Bad Request
+  <= Recv header, 24 bytes (0x18)
+  0000: Connection: Keep-Alive
+  <= Recv header, 32 bytes (0x20)
+  0000: Keep-Alive: timeout=5, max=100
+  <= Recv header, 26 bytes (0x1a)
+  0000: X-Powered-By: PHP/8.2.27
+
+

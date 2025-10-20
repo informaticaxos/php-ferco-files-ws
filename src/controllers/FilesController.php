@@ -53,20 +53,28 @@ class FilesController
      */
     public function updateFile($id)
     {
+        $log = "Iniciando updateFile para ID: $id\n";
+
         // Verificar si hay archivo en $_FILES
         if (!isset($_FILES['file'])) {
-            $this->sendResponse(400, 0, 'No file uploaded', null);
+            $log .= "No se encontró archivo en \$_FILES\n";
+            $this->sendResponse(400, 0, 'No file uploaded', null, $log);
             return;
         }
 
+        $log .= "Archivo encontrado en \$_FILES: " . print_r($_FILES['file'], true) . "\n";
+
         $file = $_FILES['file'];
         $description = $_POST['description'] ?? '';
+        $log .= "Descripción: $description\n";
 
         $updatedFile = $this->service->updateFile($id, $file, $description);
         if ($updatedFile) {
-            $this->sendResponse(200, 1, 'File updated successfully', $updatedFile->toArray());
+            $log .= "Archivo actualizado exitosamente\n";
+            $this->sendResponse(200, 1, 'File updated successfully', $updatedFile->toArray(), $log);
         } else {
-            $this->sendResponse(400, 0, 'Update error', null);
+            $log .= "Error al actualizar el archivo\n";
+            $this->sendResponse(400, 0, 'Update error', null, $log);
         }
     }
 
@@ -77,15 +85,17 @@ class FilesController
      * @param int $status
      * @param string $message
      * @param mixed $data
+     * @param string $log
      */
-    private function sendResponse($httpStatus, $status, $message, $data)
+    private function sendResponse($httpStatus, $status, $message, $data, $log = '')
     {
         http_response_code($httpStatus);
         header('Content-Type: application/json');
         echo json_encode([
             'status' => $status,
             'message' => $message,
-            'data' => $data
+            'data' => $data,
+            'log' => $log
         ]);
         exit;
     }
