@@ -76,14 +76,14 @@ class FilesRepository
     }
 
     /**
-     * Obtiene todos los files relacionados con un id_form
+     * Obtiene todos los files relacionados con un id_form, uniendo con la tabla forms
      *
      * @param int $idForm
      * @return array
      */
     public function findAllByIdForm($idForm)
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM files WHERE fk_form = ?");
+        $stmt = $this->pdo->prepare("SELECT f.* FROM files f INNER JOIN forms fo ON f.fk_form = fo.id_form WHERE f.fk_form = ?");
         $stmt->execute([$idForm]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
