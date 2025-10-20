@@ -82,13 +82,14 @@
             function loadFormularios() {
                 $('#content-area').html('<h2>Formularios</h2><div id="formularios-table"></div>');
                 $.ajax({
-                    url: '../index.php/forms', // Adjust path if needed
+                    url: 'https://fercoadvancededucation.com/php-ferco-files-ws/forms',
                     method: 'GET',
                     success: function(response) {
                         if (response.status === 1) {
-                            var table = '<table class="table table-striped"><thead><tr><th>ID</th><th>Título</th><th>Descripción</th><th>Fecha Creación</th></tr></thead><tbody>';
+                            var table = '<table class="table table-striped"><thead><tr><th>ID</th><th>Nombre</th><th>Fecha</th><th>Estado</th></tr></thead><tbody>';
                             response.data.forEach(function(form) {
-                                table += '<tr><td>' + form.id_form + '</td><td>' + form.title + '</td><td>' + (form.description || '') + '</td><td>' + form.created_at + '</td></tr>';
+                                var statusText = form.status === 1 ? 'Activo' : 'Inactivo';
+                                table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + statusText + '</td></tr>';
                             });
                             table += '</tbody></table>';
                             $('#formularios-table').html(table);
