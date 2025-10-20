@@ -1,12 +1,10 @@
-# TODO: Eliminar funcionalidad de la tabla 'document' (documents)
+# TODO: Crear funcionalidad de 'files' siguiendo patrón de 'forms'
 
-- [x] Eliminar archivos relacionados con documents:
-  - [x] src/controllers/DocumentsController.php
-  - [x] src/models/DocumentsModel.php
-  - [x] src/repositories/DocumentsRepository.php
-  - [x] src/routes/DocumentsRoute.php
-  - [x] src/services/DocumentsService.php
-- [x] Eliminar directorio uploads/documents/
-- [x] Modificar index.php para remover referencias a documents
-- [x] Verificar que la aplicación funcione solo con form (archivos eliminados correctamente, solo quedan archivos de form)
-- [ ] Probar endpoints de form
+- [x] Crear src/routes/FilesRoute.php
+- [x] Crear src/controllers/FilesController.php
+- [x] Crear src/services/FilesService.php
+- [x] Crear src/repositories/FilesRepository.php
+- [x] Crear src/models/FilesModel.php
+- [x] Modificar index.php para incluir files
+- [x] Verificar archivos creados (todos los archivos de files están presentes)
+- [ ] Probar endpoint GET /files

@@ -6,9 +6,13 @@
 require_once 'src/routes/FormRoute.php';
 $formRoutes = $routes;
 
-$routes = $formRoutes;
+require_once 'src/routes/FilesRoute.php';
+$filesRoutes = $routes;
+
+$routes = array_merge($formRoutes, $filesRoutes);
 
 require_once 'src/controllers/FormController.php';
+require_once 'src/controllers/FilesController.php';
 
 // Función para obtener el método y path de la solicitud
 function getRequestMethodAndPath()
