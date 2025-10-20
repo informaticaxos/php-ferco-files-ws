@@ -63,6 +63,14 @@ class FilesService
             return null;
         }
 
+        // Si ya hay un archivo anterior, borrarlo
+        if (!empty($existing['path'])) {
+            $oldFilePath = __DIR__ . '/../../' . $existing['path'];
+            if (file_exists($oldFilePath)) {
+                unlink($oldFilePath);
+            }
+        }
+
         // Generar nombre de archivo: DDMMYYYYHHMMSS.ext
         $timestamp = date('dmYHis');
         $extension = pathinfo($uploadedFile['name'], PATHINFO_EXTENSION);
@@ -77,11 +85,11 @@ class FilesService
             return null;
         }
 
-        // URL completa
-        $fullUrl = 'https://fercoadvancededucation.com/php-ferco-files-ws/uploaded-files/' . $filename;
+        // Ruta relativa para guardar en BD
+        $relativePath = '/uploaded-files/' . $filename;
 
         // Actualizar objeto
-        $file = new Files($id, $existing['title'], $description, $extension, $fullUrl, $existing['fk_form']);
+        $file = new Files($id, $existing['title'], $description, $extension, $relativePath, $existing['fk_form']);
         $this->repository->save($file);
         return $file;
     }

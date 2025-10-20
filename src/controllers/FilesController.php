@@ -59,6 +59,8 @@ class FilesController
         if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
             $log .= "Es una solicitud PUT, parseando multipart data manualmente\n";
             $this->parseMultipartData();
+            $log .= "Después de parsear: \$_FILES: " . print_r($_FILES, true) . "\n";
+            $log .= "Después de parsear: \$_POST: " . print_r($_POST, true) . "\n";
         }
 
         // Verificar si hay archivo en $_FILES
