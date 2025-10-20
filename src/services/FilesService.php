@@ -83,8 +83,14 @@ class FilesService
         }
         $filePath = $uploadDir . $filename;
 
-        // Mover archivo
-        if (!move_uploaded_file($uploadedFile['tmp_name'], $filePath)) {
+        // Mover archivo (para archivos parseados manualmente, copiar en lugar de mover)
+        if (file_exists($uploadedFile['tmp_name'])) {
+            if (!copy($uploadedFile['tmp_name'], $filePath)) {
+                return null;
+            }
+            // Limpiar archivo temporal
+            unlink($uploadedFile['tmp_name']);
+        } else {
             return null;
         }
 
