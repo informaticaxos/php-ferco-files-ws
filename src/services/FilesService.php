@@ -26,7 +26,13 @@ class FilesService
      */
     public function getAllFiles()
     {
-        return $this->repository->findAll();
+        $files = $this->repository->findAll();
+        foreach ($files as &$file) {
+            if (!empty($file['path'])) {
+                $file['path'] = 'https://fercoadvancededucation.com/php-ferco-files-ws' . $file['path'];
+            }
+        }
+        return $files;
     }
 
     /**
