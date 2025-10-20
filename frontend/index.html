@@ -215,7 +215,9 @@
                         if (response.status === 1) {
                             var table = '<table class="table table-striped"><thead><tr><th>ID</th><th>Nombre</th><th>Fecha</th><th>Estado</th><th>Archivos</th><th>Acciones</th></tr></thead><tbody>';
                             response.data.forEach(function(form) {
-                                var statusText = form.status === 1 ? 'Activo' : 'Inactivo';
+                                var statusText = form.status === 1 ? 'Completado' : 'Pendiente';
+                                var statusIcon = form.status === 1 ? '<i class="fas fa-check-circle text-success"></i>' : '<i class="fas fa-exclamation-triangle text-warning"></i>';
+                                var statusDisplay = statusIcon + ' ' + statusText;
                                 // Consultar archivos para este form
                                 $.ajax({
                                     url: 'https://fercoadvancededucation.com/php-ferco-files-ws/files/form/' + form.id_form,
@@ -223,10 +225,10 @@
                                     async: false, // Sincronizar para obtener el conteo antes de construir la fila
                                     success: function(fileResponse) {
                                         var fileCount = fileResponse.status === 1 ? fileResponse.data.length : 0;
-                                        table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + statusText + '</td><td>' + fileCount + '</td><td><button class="btn btn-info btn-sm me-1" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i></button><button class="btn btn-secondary btn-sm me-1" onclick="viewFilesModal(' + form.id_form + ')"><i class="fas fa-list"></i></button><button class="btn btn-danger btn-sm" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i></button></td></tr>';
+                                        table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + statusDisplay + '</td><td>' + fileCount + '</td><td><button class="btn btn-info btn-sm me-1" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i></button><button class="btn btn-secondary btn-sm me-1" onclick="viewFilesModal(' + form.id_form + ')"><i class="fas fa-list"></i></button><button class="btn btn-danger btn-sm" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i></button></td></tr>';
                                     },
                                     error: function() {
-                                        table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + statusText + '</td><td>0</td><td><button class="btn btn-info btn-sm me-1" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i></button><button class="btn btn-secondary btn-sm me-1" onclick="viewFilesModal(' + form.id_form + ')"><i class="fas fa-list"></i></button><button class="btn btn-danger btn-sm" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i></button></td></tr>';
+                                        table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + statusDisplay + '</td><td>0</td><td><button class="btn btn-info btn-sm me-1" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i></button><button class="btn btn-secondary btn-sm me-1" onclick="viewFilesModal(' + form.id_form + ')"><i class="fas fa-list"></i></button><button class="btn btn-danger btn-sm" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i></button></td></tr>';
                                     }
                                 });
                             });
