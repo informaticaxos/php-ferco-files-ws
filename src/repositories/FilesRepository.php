@@ -76,6 +76,19 @@ class FilesRepository
     }
 
     /**
+     * Obtiene todos los files relacionados con un id_form
+     *
+     * @param int $idForm
+     * @return array
+     */
+    public function findAllByIdForm($idForm)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM files WHERE fk_form = ?");
+        $stmt->execute([$idForm]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
      * Elimina un file por ID (solo el registro, renombra el archivo)
      *
      * @param int $id

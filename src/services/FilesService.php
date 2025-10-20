@@ -110,6 +110,23 @@ class FilesService
     }
 
     /**
+     * Obtiene todos los files relacionados con un id_form
+     *
+     * @param int $idForm
+     * @return array
+     */
+    public function getAllFilesByIdForm($idForm)
+    {
+        $files = $this->repository->findAllByIdForm($idForm);
+        foreach ($files as &$file) {
+            if (!empty($file['path'])) {
+                $file['path'] = 'https://fercoadvancededucation.com/php-ferco-files-ws' . $file['path'];
+            }
+        }
+        return $files;
+    }
+
+    /**
      * Elimina un file por ID (renombra el archivo y elimina el registro)
      *
      * @param int $id

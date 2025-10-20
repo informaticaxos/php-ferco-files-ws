@@ -28,6 +28,17 @@ class FilesController
     }
 
     /**
+     * Obtiene todos los files relacionados con un id_form
+     *
+     * @param int $idForm
+     */
+    public function getAllFilesByIdForm($idForm)
+    {
+        $files = $this->service->getAllFilesByIdForm($idForm);
+        $this->sendResponse(200, 1, 'Files retrieved successfully', $files);
+    }
+
+    /**
      * Crea un nuevo file
      */
     public function createFile()
