@@ -1,7 +1,9 @@
 <?php
 
 require_once __DIR__ . '/../repositories/FilesRepository.php';
+require_once __DIR__ . '/../repositories/FormRepository.php';
 require_once __DIR__ . '/../models/FilesModel.php';
+require_once __DIR__ . '/../models/FormModel.php';
 
 /**
  * Servicio para la lógica de negocio de Files
@@ -9,14 +11,16 @@ require_once __DIR__ . '/../models/FilesModel.php';
  */
 class FilesService
 {
-    private $repository;
+    private $filesRepository;
+    private $formRepository;
 
     /**
-     * Constructor: inicializa el repositorio
+     * Constructor: inicializa los repositorios
      */
     public function __construct()
     {
-        $this->repository = new FilesRepository();
+        $this->filesRepository = new FilesRepository();
+        $this->formRepository = new FormRepository();
     }
 
     /**
@@ -26,7 +30,7 @@ class FilesService
      */
     public function getAllFiles()
     {
-        $files = $this->repository->findAll();
+        $files = $this->filesRepository->findAll();
         foreach ($files as &$file) {
             if (!empty($file['path'])) {
                 $file['path'] = 'https://fercoadvancededucation.com/php-ferco-files-ws' . $file['path'];
@@ -49,7 +53,7 @@ class FilesService
         }
 
         $file = new Files(null, $data['title'], $data['description'] ?? '', $data['type'] ?? '', $data['path'] ?? '', $data['fk_form']);
-        $this->repository->save($file);
+        $this->filesRepository->save($file);
         return $file;
     }
 
@@ -64,7 +68,7 @@ class FilesService
     public function updateFile($id, $uploadedFile, $description)
     {
         // Verificar que el archivo existe en BD
-        $existing = $this->repository->findById($id);
+        $existing = $this->filesRepository->findById($id);
         if (!$existing) {
             return null;
         }
@@ -105,7 +109,37 @@ class FilesService
 
         // Actualizar objeto
         $file = new Files($id, $existing['title'], $description, $extension, $relativePath, $existing['fk_form']);
-        $this->repository->save($file);
+        $this->filesRepository->save($file);
+
+        // Validación: verificar que el path no sea null o vacío
+        if (empty($relativePath)) {
+            return null;
+        }
+
+        // Obtener el fk_form del archivo
+        $fkForm = $existing['fk_form'];
+
+        // Buscar todos los files relacionados con ese form
+        $allFiles = $this->filesRepository->findAllByIdForm($fkForm);
+
+        // Verificar uno a uno si path cumple la condición (no null o vacío)
+        $allPathsValid = true;
+        foreach ($allFiles as $fileItem) {
+            if (empty($fileItem['path'])) {
+                $allPathsValid = false;
+                break;
+            }
+        }
+
+        // Si todos los files del form tienen path válido, cambiar status del form a 1 (completado)
+        if ($allPathsValid) {
+            $form = $this->formRepository->findById($fkForm);
+            if ($form) {
+                $formObj = new Form($form['id_form'], $form['name'], $form['date'], 1);
+                $this->formRepository->save($formObj);
+            }
+        }
+
         return $file;
     }
 
@@ -117,7 +151,7 @@ class FilesService
      */
     public function getAllFilesByIdForm($idForm)
     {
-        $files = $this->repository->findAllByIdForm($idForm);
+        $files = $this->filesRepository->findAllByIdForm($idForm);
         foreach ($files as &$file) {
             if (!empty($file['path'])) {
                 $file['path'] = 'https://fercoadvancededucation.com/php-ferco-files-ws' . $file['path'];
@@ -135,7 +169,7 @@ class FilesService
     public function deleteFile($id)
     {
         // Verificar que el archivo existe en BD
-        $existing = $this->repository->findById($id);
+        $existing = $this->filesRepository->findById($id);
         if (!$existing) {
             return false;
         }
@@ -154,6 +188,6 @@ class FilesService
         }
 
         // Eliminar el registro de la BD
-        return $this->repository->delete($id);
+        return $this->filesRepository->delete($id);
     }
 }
