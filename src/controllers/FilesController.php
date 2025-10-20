@@ -55,9 +55,18 @@ class FilesController
     {
         $log = "Iniciando updateFile para ID: $id\n";
 
+        // Para PUT requests con multipart/form-data, necesitamos parsear manualmente
+        if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+            $log .= "Es una solicitud PUT, parseando multipart data manualmente\n";
+            $this->parseMultipartData();
+        }
+
         // Verificar si hay archivo en $_FILES
         if (!isset($_FILES['file'])) {
             $log .= "No se encontró archivo en \$_FILES\n";
+            $log .= "Contenido de \$_FILES: " . print_r($_FILES, true) . "\n";
+            $log .= "Contenido de \$_POST: " . print_r($_POST, true) . "\n";
+            $log .= "Contenido de \$_REQUEST: " . print_r($_REQUEST, true) . "\n";
             $this->sendResponse(400, 0, 'No file uploaded', null, $log);
             return;
         }
@@ -76,6 +85,82 @@ class FilesController
             $log .= "Error al actualizar el archivo\n";
             $this->sendResponse(400, 0, 'Update error', null, $log);
         }
+    }
+
+    /**
+     * Parsea datos multipart/form-data para PUT requests
+     */
+    private function parseMultipartData()
+    {
+        $input = file_get_contents('php://input');
+        $boundary = $this->getBoundary();
+
+        if (!$boundary) {
+            return;
+        }
+
+        $parts = explode('--' . $boundary, $input);
+        foreach ($parts as $part) {
+            $part = trim($part);
+            if (empty($part) || $part === '--') {
+                continue;
+            }
+
+            // Separar headers y body
+            $headerEnd = strpos($part, "\r\n\r\n");
+            if ($headerEnd === false) {
+                continue;
+            }
+
+            $headers = substr($part, 0, $headerEnd);
+            $body = substr($part, $headerEnd + 4);
+
+            // Parsear Content-Disposition
+            if (preg_match('/Content-Disposition: form-data; name="([^"]+)";? ?(?:filename="([^"]+)")?/', $headers, $matches)) {
+                $name = $matches[1];
+                $filename = $matches[2] ?? null;
+
+                if ($filename) {
+                    // Es un archivo
+                    $tmpFile = tempnam(sys_get_temp_dir(), 'upload');
+                    file_put_contents($tmpFile, $body);
+
+                    $_FILES[$name] = [
+                        'name' => $filename,
+                        'type' => $this->getContentType($headers),
+                        'tmp_name' => $tmpFile,
+                        'error' => UPLOAD_ERR_OK,
+                        'size' => strlen($body)
+                    ];
+                } else {
+                    // Es un campo de texto
+                    $_POST[$name] = $body;
+                }
+            }
+        }
+    }
+
+    /**
+     * Obtiene el boundary del Content-Type
+     */
+    private function getBoundary()
+    {
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+        if (preg_match('/boundary=([^;]+)/', $contentType, $matches)) {
+            return trim($matches[1], '"');
+        }
+        return null;
+    }
+
+    /**
+     * Obtiene el Content-Type de los headers
+     */
+    private function getContentType($headers)
+    {
+        if (preg_match('/Content-Type: ([^\r\n]+)/', $headers, $matches)) {
+            return trim($matches[1]);
+        }
+        return 'application/octet-stream';
     }
 
     /**
