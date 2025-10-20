@@ -146,8 +146,19 @@
                             var table = '<table class="table table-striped"><thead><tr><th>ID</th><th>Nombre</th><th>Fecha</th><th>Estado</th><th>Archivos</th><th>Acciones</th></tr></thead><tbody>';
                             response.data.forEach(function(form) {
                                 var statusText = form.status === 1 ? 'Activo' : 'Inactivo';
-                                var fileCount = form.file_count || 0; // Assuming the API returns file_count
-                                table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + statusText + '</td><td>' + fileCount + '</td><td><button class="btn btn-info btn-sm me-2" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i></button><button class="btn btn-danger btn-sm" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i></button></td></tr>';
+                                // Consultar archivos para este form
+                                $.ajax({
+                                    url: 'https://fercoadvancededucation.com/php-ferco-files-ws/files/form/' + form.id_form,
+                                    method: 'GET',
+                                    async: false, // Sincronizar para obtener el conteo antes de construir la fila
+                                    success: function(fileResponse) {
+                                        var fileCount = fileResponse.status === 1 ? fileResponse.data.length : 0;
+                                        table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + statusText + '</td><td>' + fileCount + '</td><td><button class="btn btn-info btn-sm me-2" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i></button><button class="btn btn-danger btn-sm" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i></button></td></tr>';
+                                    },
+                                    error: function() {
+                                        table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + statusText + '</td><td>0</td><td><button class="btn btn-info btn-sm me-2" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i></button><button class="btn btn-danger btn-sm" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i></button></td></tr>';
+                                    }
+                                });
                             });
                             table += '</tbody></table>';
                             $('#formularios-table').html(table);
