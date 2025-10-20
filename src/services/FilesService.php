@@ -108,4 +108,35 @@ class FilesService
         $this->repository->save($file);
         return $file;
     }
+
+    /**
+     * Elimina un file por ID (renombra el archivo y elimina el registro)
+     *
+     * @param int $id
+     * @return bool
+     */
+    public function deleteFile($id)
+    {
+        // Verificar que el archivo existe en BD
+        $existing = $this->repository->findById($id);
+        if (!$existing) {
+            return false;
+        }
+
+        // Si hay un archivo asociado, renombrarlo anteponiendo el ID
+        if (!empty($existing['path'])) {
+            $oldFilePath = __DIR__ . '/../../' . $existing['path'];
+            if (file_exists($oldFilePath)) {
+                // Extraer el nombre del archivo del path
+                $filename = basename($existing['path']);
+                // Nuevo nombre: id_filename
+                $newFilename = $id . '_' . $filename;
+                $newFilePath = dirname($oldFilePath) . '/' . $newFilename;
+                rename($oldFilePath, $newFilePath);
+            }
+        }
+
+        // Eliminar el registro de la BD
+        return $this->repository->delete($id);
+    }
 }

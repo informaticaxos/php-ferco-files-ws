@@ -74,4 +74,16 @@ class FilesRepository
             $file->setIdFile($this->pdo->lastInsertId());
         }
     }
+
+    /**
+     * Elimina un file por ID (solo el registro, renombra el archivo)
+     *
+     * @param int $id
+     * @return bool
+     */
+    public function delete($id)
+    {
+        $stmt = $this->pdo->prepare("DELETE FROM files WHERE id_file = ?");
+        return $stmt->execute([$id]);
+    }
 }
