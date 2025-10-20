@@ -78,6 +78,9 @@ class FilesService
 
         // Ruta de destino
         $uploadDir = __DIR__ . '/../../uploaded-files/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
         $filePath = $uploadDir . $filename;
 
         // Mover archivo
