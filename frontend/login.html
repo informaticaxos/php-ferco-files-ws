@@ -88,25 +88,42 @@
 
     <script>
         $(document).ready(function() {
+            // Check if already logged in
+            if (localStorage.getItem('loggedIn') === 'true') {
+                window.location.href = 'index.html';
+                return;
+            }
+
             $('#login-form').on('submit', function(e) {
                 e.preventDefault();
                 const email = $('#email').val();
                 const password = $('#password').val();
 
-                // Aquí puedes agregar la lógica para enviar los datos al backend
-                // Por ejemplo, usando AJAX para autenticar
+                // Default credentials
+                const defaultUser = 'ccoronel';
+                const defaultPass = 'Kovu2017';
 
-                // Simulación de login exitoso
-                Swal.fire({
-                    icon: 'success',
-                    title: '¡Bienvenido!',
-                    text: 'Inicio de sesión exitoso.',
-                    timer: 2000,
-                    showConfirmButton: false
-                }).then(() => {
-                    // Redirigir a la página principal o dashboard
-                    window.location.href = 'index.html';
-                });
+                if (email === defaultUser && password === defaultPass) {
+                    // Store session in localStorage
+                    localStorage.setItem('loggedIn', 'true');
+                    localStorage.setItem('user', email);
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Bienvenido!',
+                        text: 'Inicio de sesión exitoso.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = 'index.html';
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Credenciales incorrectas. Inténtalo de nuevo.'
+                    });
+                }
             });
         });
     </script>
