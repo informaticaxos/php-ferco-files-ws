@@ -133,6 +133,11 @@
                                 <i class="fas fa-file-alt"></i> Formularios
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="usuarios">
+                                <i class="fas fa-users"></i> Usuarios
+                            </a>
+                        </li>
                         <!-- Add more menu items here if needed -->
                     </ul>
                 </div>
@@ -149,6 +154,11 @@
                         <li class="nav-item">
                             <a class="nav-link active" href="#" data-section="formularios">
                                 <i class="fas fa-file-alt"></i> Formularios
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="usuarios">
+                                <i class="fas fa-users"></i> Usuarios
                             </a>
                         </li>
                         <!-- Add more menu items here if needed -->
@@ -316,6 +326,77 @@
         </div>
     </div>
 
+    <!-- Modal for creating new user -->
+    <div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createUserModalLabel">Crear Nuevo Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createUserForm">
+                        <div class="mb-3">
+                            <label for="userName" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="userName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="userEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userRole" class="form-label">Rol</label>
+                            <select class="form-control" id="userRole" required>
+                                <option value="user">User</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-xs" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary btn-xs" id="saveUser">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for editing user -->
+    <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editUserModalLabel">Editar Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editUserForm">
+                        <input type="hidden" id="editUserId">
+                        <div class="mb-3">
+                            <label for="editUserName" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="editUserName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editUserEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="editUserEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editUserRole" class="form-label">Rol</label>
+                            <select class="form-control" id="editUserRole" required>
+                                <option value="user">User</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-xs" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary btn-xs" id="updateUser">Actualizar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- jQuery -->
@@ -347,6 +428,8 @@
             function loadSection(section) {
                 if (section === 'formularios') {
                     loadFormularios();
+                } else if (section === 'usuarios') {
+                    loadUsuarios();
                 }
             }
 
@@ -395,6 +478,26 @@
                     },
                     error: function() {
                         $('#formularios-table').html('<p>Error de conexión.</p>');
+                    }
+                });
+            }
+
+            // Load usuarios
+            function loadUsuarios() {
+                $('#content-area').html('<h2>Usuarios</h2><div class="d-flex justify-content-between mb-3"><div class="d-flex"><input type="text" id="searchUserName" class="form-control form-control-sm me-2" placeholder="Buscar por nombre"><select id="filterRole" class="form-select form-select-sm me-2"><option value="">Todos los roles</option><option value="admin">Admin</option><option value="user">User</option></select></div><div><button id="refreshUsersBtn" class="btn btn-secondary btn-sm"><i class="fas fa-sync"></i> Actualizar</button><button type="button" class="btn btn-outline-dark btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#createUserModal"><i class="fas fa-user-plus"></i> Nuevo</button></div></div><div id="usuarios-table" class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Cargando...</span></div></div>');
+                $.ajax({
+                    url: 'https://fercoadvancededucation.com/php-ferco-files-ws/users',
+                    method: 'GET',
+                    success: function(response) {
+                        if (response.status === 1) {
+                            usersData = response.data; // Store the data
+                            renderUsersTable();
+                        } else {
+                            $('#usuarios-table').html('<p>Error al cargar usuarios: ' + response.message + '</p>');
+                        }
+                    },
+                    error: function() {
+                        $('#usuarios-table').html('<p>Error de conexión.</p>');
                     }
                 });
             }
@@ -792,6 +895,170 @@
                     }
                 });
             });
+
+            // Event listeners for user search and filter
+            $(document).on('input', '#searchUserName', function() {
+                renderUsersTable();
+            });
+            $(document).on('change', '#filterRole', function() {
+                renderUsersTable();
+            });
+            $(document).on('click', '#refreshUsersBtn', function() {
+                loadUsuarios();
+            });
+
+            // Render users table
+            function renderUsersTable() {
+                var searchTerm = $('#searchUserName').val().toLowerCase();
+                var roleFilter = $('#filterRole').val();
+                var filteredData = usersData.filter(function(user) {
+                    var matchesSearch = user.name.toLowerCase().includes(searchTerm);
+                    var matchesRole = roleFilter === '' || user.role === roleFilter;
+                    return matchesSearch && matchesRole;
+                });
+                var table = '<table class="table table-striped"><thead><tr><th>ID</th><th>Nombre</th><th>Email</th><th>Rol</th><th>Acciones</th></tr></thead><tbody>';
+                filteredData.forEach(function(user) {
+                    table += '<tr><td>' + user.id_user + '</td><td>' + user.name + '</td><td>' + user.email + '</td><td>' + user.role + '</td><td><div class="d-flex gap-1"><button class="btn btn-warning btn-xs" onclick="openEditUserModal(' + user.id_user + ', \'' + user.name.replace(/'/g, "\\'") + '\', \'' + user.email + '\', \'' + user.role + '\')"><i class="fas fa-edit"></i> Edit</button><button class="btn btn-danger btn-xs" onclick="deleteUser(' + user.id_user + ')"><i class="fas fa-trash"></i> Delete</button></div></td></tr>';
+                });
+                table += '</tbody></table>';
+                $('#usuarios-table').html(table);
+            }
+
+            // Save new user
+            $('#saveUser').click(function() {
+                var name = $('#userName').val();
+                var email = $('#userEmail').val();
+                var role = $('#userRole').val();
+                if (name && email && role) {
+                    $.ajax({
+                        url: 'https://fercoadvancededucation.com/php-ferco-files-ws/users',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            name: name,
+                            email: email,
+                            role: role
+                        }),
+                        success: function(response) {
+                            Swal.fire({
+                                icon: response.status === 1 ? 'success' : 'error',
+                                title: response.status === 1 ? 'Éxito' : 'Error',
+                                text: response.message
+                            });
+                            if (response.status === 1) {
+                                $('#createUserModal').modal('hide');
+                                $('#createUserForm')[0].reset();
+                                loadUsuarios(); // Reload the table
+                            }
+                        },
+                        error: function() {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Error de conexión.'
+                            });
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Campos requeridos',
+                        text: 'Por favor, complete todos los campos.'
+                    });
+                }
+            });
+
+            // Open edit user modal
+            window.openEditUserModal = function(id, name, email, role) {
+                $('#editUserId').val(id);
+                $('#editUserName').val(name);
+                $('#editUserEmail').val(email);
+                $('#editUserRole').val(role);
+                $('#editUserModal').modal('show');
+            };
+
+            // Update user
+            $('#updateUser').click(function() {
+                var id = $('#editUserId').val();
+                var name = $('#editUserName').val();
+                var email = $('#editUserEmail').val();
+                var role = $('#editUserRole').val();
+                if (name && email && role) {
+                    $.ajax({
+                        url: 'https://fercoadvancededucation.com/php-ferco-files-ws/users/' + id,
+                        method: 'PUT',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            name: name,
+                            email: email,
+                            role: role
+                        }),
+                        success: function(response) {
+                            Swal.fire({
+                                icon: response.status === 1 ? 'success' : 'error',
+                                title: response.status === 1 ? 'Éxito' : 'Error',
+                                text: response.message
+                            });
+                            if (response.status === 1) {
+                                $('#editUserModal').modal('hide');
+                                $('#editUserForm')[0].reset();
+                                loadUsuarios(); // Reload the table
+                            }
+                        },
+                        error: function() {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Error de conexión.'
+                            });
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Campos requeridos',
+                        text: 'Por favor, complete todos los campos.'
+                    });
+                }
+            });
+
+            // Delete user
+            window.deleteUser = function(id) {
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: 'Esta acción no se puede deshacer.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: 'https://fercoadvancededucation.com/php-ferco-files-ws/users/' + id,
+                            method: 'DELETE',
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: response.status === 1 ? 'success' : 'error',
+                                    title: response.status === 1 ? 'Eliminado' : 'Error',
+                                    text: response.message
+                                });
+                                if (response.status === 1) {
+                                    loadUsuarios(); // Reload the table
+                                }
+                            },
+                            error: function() {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Error de conexión.'
+                                });
+                            }
+                        });
+                    }
+                });
+            };
         });
     </script>
 </body>
