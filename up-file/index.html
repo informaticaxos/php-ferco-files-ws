@@ -166,8 +166,10 @@
                             files.forEach(file => {
                                 html += `
                                     <div class="card mb-3">
+                                        <div class="card-header" style="background-color: #495057; color: #fff; font-weight: 600;">
+                                            <h5 class="card-title mb-0">${file.title}</h5>
+                                        </div>
                                         <div class="card-body">
-                                            <h5 class="card-title">${file.title}</h5>
                                             <form class="update-file-form" data-id-file="${file.id_file}" enctype="multipart/form-data">
                                                 <div class="mb-3">
                                                     <label for="description_${file.id_file}" class="form-label">Descripción (opcional)</label>
