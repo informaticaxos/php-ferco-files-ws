@@ -6,10 +6,53 @@
     <title>Información del Formulario</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- SweetAlert2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <style>
+        .header {
+            background-color: #343a40;
+            border-bottom: 1px solid #dee2e6;
+            padding: 10px 20px;
+            color: #fff;
+        }
+        .header .logo {
+            height: 50px;
+        }
+        .header .company-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+        }
+        @media (max-width: 767.98px) {
+            .header .company-name {
+                font-size: 1.2rem;
+            }
+        }
+        .btn-xs {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+        .form-control-sm {
+            font-size: 0.875rem;
+        }
+        body {
+            font-size: 0.875rem;
+        }
+    </style>
 </head>
 <body>
+    <!-- Header -->
+    <header class="header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <img src="https://fercoadvancededucation.com/data/logo%20ferco%20normal.png" alt="Logo Ferco" class="logo me-3">
+                <span class="company-name">FERCO ADVANCED EDUCATION</span>
+            </div>
+        </div>
+    </header>
+
     <div class="container mt-5">
         <div id="form-info" class="mb-4">
             <!-- Información del formulario se cargará aquí -->
@@ -74,6 +117,9 @@
                                     <p><strong>ID:</strong> ${form.id_form}</p>
                                     <p><strong>Nombre:</strong> ${form.name}</p>
                                     <p><strong>Fecha:</strong> ${form.date}</p>
+                                    <p><strong>Teléfono:</strong> ${form.phone || ''}</p>
+                                    <p><strong>País:</strong> ${form.country || ''}</p>
+                                    <p><strong>Email:</strong> ${form.email || ''}</p>
                                     <p><strong>Estado:</strong> ${form.status === 1 ? 'Completado' : 'Pendiente'}</p>
                                 </div>
                             </div>
@@ -120,14 +166,14 @@
                                             <form class="update-file-form" data-id-file="${file.id_file}" enctype="multipart/form-data">
                                                 <div class="mb-3">
                                                     <label for="description_${file.id_file}" class="form-label">Descripción (opcional)</label>
-                                                    <input type="text" class="form-control" id="description_${file.id_file}" name="description" value="${file.description || ''}">
+                                                    <input type="text" class="form-control form-control-sm" id="description_${file.id_file}" name="description" value="${file.description || ''}">
                                                 </div>
                                                 <div class="mb-3">
                                                     <label for="file_${file.id_file}" class="form-label">Archivo *</label>
-                                                    <input type="file" class="form-control" id="file_${file.id_file}" name="file" required>
+                                                    <input type="file" class="form-control form-control-sm" id="file_${file.id_file}" name="file" required>
                                                 </div>
-                                                <button type="submit" class="btn btn-primary">Actualizar Archivo</button>
-                                                ${file.path ? `<a href="${file.path}" target="_blank" class="btn btn-secondary ms-2">Ver Archivo Actual</a>` : '<span class="text-warning ms-2">Archivo no subido</span>'}
+                                                <button type="submit" class="btn btn-primary btn-xs">Actualizar Archivo</button>
+                                                ${file.path ? `<a href="${file.path}" target="_blank" class="btn btn-secondary btn-xs ms-2">Ver Archivo Actual</a>` : '<span class="text-warning ms-2">Archivo no subido</span>'}
                                             </form>
                                         </div>
                                     </div>
