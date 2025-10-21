@@ -1,8 +1,10 @@
-# TODO: Agregar funcionalidad updateFile a 'files'
+# TODO: Agregar funcionalidad de la tabla 'countries' con getAllCountries
 
-- [x] Crear carpeta uploaded-files
-- [x] Agregar ruta PUT /files/{id} en src/routes/FilesRoute.php
-- [x] Agregar método updateFile en src/controllers/FilesController.php
-- [x] Agregar método updateFile en src/services/FilesService.php
-- [x] Modificar método save en src/repositories/FilesRepository.php para manejar archivos
-- [x] Actualizar TODO.md con nueva tarea
+- [x] Crear src/models/CountriesModel.php
+- [x] Crear src/repositories/CountriesRepository.php
+- [x] Crear src/services/CountriesService.php
+- [x] Crear src/controllers/CountriesController.php
+- [x] Crear src/routes/CountriesRoute.php
+- [x] Modificar index.php para incluir rutas y controlador de countries
+- [ ] Verificar que la nueva ruta funcione correctamente (prueba manual requerida)
+- [ ] Probar el endpoint GET /countries (prueba manual requerida)
