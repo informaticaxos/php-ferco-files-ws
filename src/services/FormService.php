@@ -112,12 +112,30 @@ class FormService
     }
 
     /**
-     * Elimina un form por ID
+     * Elimina un form por ID (primero elimina los files asociados)
      *
      * @param int $id
      */
     public function deleteForm($id)
     {
+        // Verificar que el form existe
+        $form = $this->repository->findById($id);
+        if (!$form) {
+            return false;
+        }
+
+        // Obtener todos los files asociados al form
+        require_once __DIR__ . '/FilesService.php';
+        $filesService = new FilesService();
+        $files = $filesService->getAllFilesByIdForm($id);
+
+        // Eliminar cada file (renombrar archivo y eliminar registro)
+        foreach ($files as $file) {
+            $filesService->deleteFile($file['id_file']);
+        }
+
+        // Finalmente, eliminar el form
         $this->repository->delete($id);
+        return true;
     }
 }

@@ -83,14 +83,18 @@ class FormController
     }
 
     /**
-     * Elimina un form por ID
+     * Elimina un form por ID (primero elimina los files asociados)
      *
      * @param int $id
      */
     public function delete($id)
     {
-        $this->service->deleteForm($id);
-        $this->sendResponse(200, 1, 'Form deleted successfully', null);
+        $result = $this->service->deleteForm($id);
+        if ($result) {
+            $this->sendResponse(200, 1, 'Form and associated files deleted successfully', null);
+        } else {
+            $this->sendResponse(404, 0, 'Form not found', null);
+        }
     }
 
     /**
