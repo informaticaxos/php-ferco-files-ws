@@ -337,8 +337,8 @@
                 <div class="modal-body">
                     <form id="createUserForm">
                         <div class="mb-3">
-                            <label for="userName" class="form-label">Nombre</label>
-                            <input type="text" class="form-control" id="userName" required>
+                            <label for="newUserName" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="newUserName" required>
                         </div>
                         <div class="mb-3">
                             <label for="userEmail" class="form-label">Email</label>
@@ -916,7 +916,7 @@
 
             // Save new user
             $('#saveUser').click(function() {
-                var name = $('#userName').val();
+                var name = $('#newUserName').val();
                 var email = $('#userEmail').val();
                 var password = $('#userPassword').val();
                 if (name && email && password) {
