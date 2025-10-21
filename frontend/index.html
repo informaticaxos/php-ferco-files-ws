@@ -214,11 +214,14 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="input-group mb-3">
+                    <div class="mb-3">
+                        <label for="shareLink" class="form-label">Enlace de Compartir</label>
                         <input type="text" class="form-control" id="shareLink" readonly>
-                        <button class="btn btn-outline-secondary btn-sm" type="button" id="copyLink"><i class="fas fa-copy"></i> Copiar enlace </button>
-                        <button class="btn btn-primary btn-sm" id="openLink"><i class="fas fa-external-link-alt"></i> Abrir enlace en nueva ventana</button>
-                        <button class="btn btn-success btn-sm" id="shareWhatsApp"><i class="fab fa-whatsapp"></i> Compartir en WhatsApp</button>
+                    </div>
+                    <div class="d-flex flex-column gap-2">
+                        <button class="btn btn-outline-secondary" type="button" id="copyLink"><i class="fas fa-copy"></i> Copiar enlace</button>
+                        <button class="btn btn-primary" id="openLink"><i class="fas fa-external-link-alt"></i> Abrir enlace en nueva ventana</button>
+                        <button class="btn btn-success" id="shareWhatsApp"><i class="fab fa-whatsapp"></i> Compartir en WhatsApp</button>
                     </div>
                 </div>
                 <div class="modal-footer">
