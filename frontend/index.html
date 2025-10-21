@@ -176,6 +176,29 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal for sharing form -->
+    <div class="modal fade" id="shareFormModal" tabindex="-1" aria-labelledby="shareFormModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="shareFormModalLabel">Compartir Formulario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Enlace para compartir:</p>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" id="shareLink" readonly>
+                        <button class="btn btn-outline-secondary" type="button" id="copyLink"><i class="fas fa-copy"></i> Copiar</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="openLink"><i class="fas fa-external-link-alt"></i> Abrir en nueva ventana</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
         </div>
     </div>
 
@@ -225,10 +248,10 @@
                                     async: false, // Sincronizar para obtener el conteo antes de construir la fila
                                     success: function(fileResponse) {
                                         var fileCount = fileResponse.status === 1 ? fileResponse.data.length : 0;
-                                        table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + statusDisplay + '</td><td>' + fileCount + '</td><td><button class="btn btn-info btn-sm me-1" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i></button><button class="btn btn-secondary btn-sm me-1" onclick="viewFilesModal(' + form.id_form + ')"><i class="fas fa-list"></i></button><button class="btn btn-danger btn-sm" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i></button></td></tr>';
+                                        table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + statusDisplay + '</td><td>' + fileCount + '</td><td><button class="btn btn-info btn-sm me-1" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i></button><button class="btn btn-secondary btn-sm me-1" onclick="viewFilesModal(' + form.id_form + ')"><i class="fas fa-list"></i></button><button class="btn btn-success btn-sm me-1" onclick="shareFormModal(' + form.id_form + ')"><i class="fas fa-share"></i></button><button class="btn btn-danger btn-sm" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i></button></td></tr>';
                                     },
                                     error: function() {
-                                        table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + statusDisplay + '</td><td>0</td><td><button class="btn btn-info btn-sm me-1" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i></button><button class="btn btn-secondary btn-sm me-1" onclick="viewFilesModal(' + form.id_form + ')"><i class="fas fa-list"></i></button><button class="btn btn-danger btn-sm" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i></button></td></tr>';
+                                        table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + statusDisplay + '</td><td>0</td><td><button class="btn btn-info btn-sm me-1" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i></button><button class="btn btn-secondary btn-sm me-1" onclick="viewFilesModal(' + form.id_form + ')"><i class="fas fa-list"></i></button><button class="btn btn-success btn-sm me-1" onclick="shareFormModal(' + form.id_form + ')"><i class="fas fa-share"></i></button><button class="btn btn-danger btn-sm" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i></button></td></tr>';
                                     }
                                 });
                             });
@@ -416,6 +439,40 @@
                     }
                 });
             };
+
+            // Share form modal
+            window.shareFormModal = function(idForm) {
+                var shareUrl = 'https://fercoadvancededucation.com/php-ferco-files-ws/up-file/index.html?id_form=' + idForm;
+                $('#shareLink').val(shareUrl);
+                $('#shareFormModal').modal('show');
+            };
+
+            // Copy link to clipboard
+            $('#copyLink').click(function() {
+                var copyText = document.getElementById('shareLink');
+                copyText.select();
+                copyText.setSelectionRange(0, 99999); // For mobile devices
+                navigator.clipboard.writeText(copyText.value).then(function() {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Copiado',
+                        text: 'Enlace copiado al portapapeles.'
+                    });
+                }).catch(function(err) {
+                    console.error('Error al copiar: ', err);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se pudo copiar el enlace.'
+                    });
+                });
+            });
+
+            // Open link in new window
+            $('#openLink').click(function() {
+                var url = $('#shareLink').val();
+                window.open(url, '_blank');
+            });
 
             // Delete form
             window.deleteForm = function(id) {
