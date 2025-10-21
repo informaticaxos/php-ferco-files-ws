@@ -399,7 +399,7 @@
                     var matchesCountry = countryFilter === '' || form.country === countryFilter;
                     return matchesSearch && matchesStatus && matchesCountry;
                 });
-                var table = '<table class="table table-striped"><thead><tr><th>ID</th><th>Nombre</th><th>Fecha</th><th>Teléfono</th><th>País</th><th>Email</th><th>Estado</th><th>Archivos</th><th>Acciones</th></tr></thead><tbody>';
+                var table = '<table class="table table-striped"><thead><tr><th>ID</th><th>Nombre</th><th>Fecha</th><th>Teléfono</th><th>País</th><th>Email</th><th>Estado</th><th>Files</th><th>Acciones</th></tr></thead><tbody>';
                 filteredData.forEach(function(form) {
                     var statusText = form.status === 1 ? 'Completado' : 'Pendiente';
                     var statusIcon = form.status === 1 ? '<i class="fas fa-check-circle text-success"></i>' : '<i class="fas fa-exclamation-triangle text-warning"></i>';
