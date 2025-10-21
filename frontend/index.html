@@ -124,6 +124,18 @@
                             <label for="formDate" class="form-label">Fecha</label>
                             <input type="date" class="form-control" id="formDate" required>
                         </div>
+                        <div class="mb-3">
+                            <label for="formPhone" class="form-label">Teléfono</label>
+                            <input type="text" class="form-control" id="formPhone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="formCountry" class="form-label">País</label>
+                            <input type="text" class="form-control" id="formCountry" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="formEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="formEmail" required>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -303,7 +315,10 @@
             $('#saveForm').click(function() {
                 var name = $('#formName').val();
                 var date = $('#formDate').val();
-                if (name && date) {
+                var phone = $('#formPhone').val();
+                var country = $('#formCountry').val();
+                var email = $('#formEmail').val();
+                if (name && date && phone && country && email) {
                     $.ajax({
                         url: 'https://fercoadvancededucation.com/php-ferco-files-ws/forms',
                         method: 'POST',
@@ -311,7 +326,10 @@
                         data: JSON.stringify({
                             name: name,
                             date: date,
-                            status: 0
+                            status: 0,
+                            phone: phone,
+                            country: country,
+                            email: email
                         }),
                         success: function(response) {
                             Swal.fire({
