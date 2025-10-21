@@ -114,13 +114,18 @@
                                     <h5>Información del Formulario</h5>
                                 </div>
                                 <div class="card-body">
-                                    <p><strong>ID:</strong> ${form.id_form}</p>
-                                    <p><strong>Nombre:</strong> ${form.name}</p>
-                                    <p><strong>Fecha:</strong> ${form.date}</p>
-                                    <p><strong>Teléfono:</strong> ${form.phone || ''}</p>
-                                    <p><strong>País:</strong> ${form.country || ''}</p>
-                                    <p><strong>Email:</strong> ${form.email || ''}</p>
-                                    <p><strong>Estado:</strong> ${form.status === 1 ? 'Completado' : 'Pendiente'}</p>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong>Nombre:</strong> ${form.name}</p>
+                                            <p><strong>Fecha:</strong> ${form.date}</p>
+                                            <p><strong>Estado:</strong> ${form.status === 1 ? 'Completado' : 'Pendiente'}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>Teléfono:</strong> ${form.phone || ''}</p>
+                                            <p><strong>País:</strong> ${form.country || ''}</p>
+                                            <p><strong>Email:</strong> ${form.email || ''}</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         `);
