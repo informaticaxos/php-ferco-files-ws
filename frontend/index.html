@@ -44,6 +44,15 @@
             font-weight: bold;
             color: #fff;
         }
+        .header .logout-btn {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: #fff;
+        }
+        .header .logout-btn:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
         @media (max-width: 767.98px) {
             .header .company-name {
                 font-size: 1.2rem;
@@ -99,10 +108,15 @@
                 <img src="https://fercoadvancededucation.com/data/logo%20ferco%20normal.png" alt="Logo Ferco" class="logo me-3">
                 <span class="company-name">Ferco Advanced Education</span>
             </div>
-            <!-- Mobile menu toggle -->
-            <button class="btn btn-outline-secondary btn-xs d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
-                <i class="fas fa-bars"></i>
-            </button>
+            <div class="d-flex align-items-center">
+                <button id="logoutBtn" class="btn logout-btn btn-sm me-2" title="Cerrar Sesión">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </button>
+                <!-- Mobile menu toggle -->
+                <button class="btn btn-outline-secondary btn-xs d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
         </div>
     </header>
 
@@ -750,6 +764,26 @@
                     }
                 });
             };
+
+            // Logout functionality
+            $('#logoutBtn').click(function() {
+                Swal.fire({
+                    title: '¿Cerrar sesión?',
+                    text: '¿Estás seguro de que quieres cerrar sesión?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sí, cerrar sesión',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        localStorage.removeItem('loggedIn');
+                        localStorage.removeItem('user');
+                        window.location.href = 'login.html';
+                    }
+                });
+            });
         });
     </script>
 </body>
