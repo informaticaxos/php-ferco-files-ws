@@ -59,8 +59,14 @@ class FormService
         }
 
         $form = new Form(null, $data['name'], $data['date'], $data['status'] ?? 0, $data['phone'] ?? '', $data['country'] ?? '', $data['email'] ?? '');
-        $this->repository->save($form);
-        return $form;
+        $savedForm = $this->repository->save($form);
+
+        // Después de guardar el form, verificar los files relacionados
+        if ($savedForm) {
+            $this->checkAndUpdateFormStatus($savedForm->getIdForm());
+        }
+
+        return $savedForm;
     }
 
     /**
@@ -109,6 +115,36 @@ class FormService
         $form = new Form($id, $existing['name'], $existing['date'], $state, $existing['phone'], $existing['country'], $existing['email']);
         $this->repository->save($form);
         return $form;
+    }
+
+    /**
+     * Verifica y actualiza el status del form basado en los files relacionados
+     *
+     * @param int $formId
+     */
+    private function checkAndUpdateFormStatus($formId)
+    {
+        // Obtener todos los files relacionados con el form
+        require_once __DIR__ . '/../repositories/FilesRepository.php';
+        $filesRepository = new FilesRepository();
+        $allFiles = $filesRepository->findAllByIdForm($formId);
+
+        // Verificar uno a uno si path cumple la condición (no null o vacío)
+        $allPathsValid = true;
+        foreach ($allFiles as $fileItem) {
+            if (empty($fileItem['path'])) {
+                $allPathsValid = false;
+                break;
+            }
+        }
+
+        // Actualizar el status del form: 1 si todos completos, 0 si no
+        $form = $this->repository->findById($formId);
+        if ($form) {
+            $newStatus = $allPathsValid ? 1 : 0;
+            $formObj = new Form($form['id_form'], $form['name'], $form['date'], $newStatus, $form['phone'], $form['country'], $form['email']);
+            $this->repository->save($formObj);
+        }
     }
 
     /**
