@@ -313,7 +313,7 @@
 
             // Load formularios
             function loadFormularios() {
-                $('#content-area').html('<h2>Formularios</h2><div class="d-flex justify-content-between mb-3"><div class="d-flex"><input type="text" id="searchName" class="form-control form-control-sm me-2" placeholder="Buscar por nombre"><select id="filterStatus" class="form-select form-select-sm me-2"><option value="">Todos los estados</option><option value="1">Completado</option><option value="0">Pendiente</option></select><select id="filterCountry" class="form-select form-select-sm me-2"><option value="">Todos los países</option></select></div><div><button id="refreshBtn" class="btn btn-secondary btn-sm"><i class="fas fa-sync"></i> Actualizar</button><button type="button" class="btn btn-outline-dark btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#createFormModal"><i class="fas fa-file-plus"></i> Nuevo</button></div></div><div id="formularios-table" class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Cargando...</span></div></div>');
+                $('#content-area').html('<h2>Formularios</h2><div class="d-flex justify-content-between mb-3"><div class="d-flex"><input type="text" id="searchName" class="form-control form-control-sm me-2" placeholder="Buscar por nombre o email"><select id="filterStatus" class="form-select form-select-sm me-2"><option value="">Todos los estados</option><option value="1">Completado</option><option value="0">Pendiente</option></select><select id="filterCountry" class="form-select form-select-sm me-2"><option value="">Todos los países</option></select></div><div><button id="refreshBtn" class="btn btn-secondary btn-sm"><i class="fas fa-sync"></i> Actualizar</button><button type="button" class="btn btn-outline-dark btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#createFormModal"><i class="fas fa-file-plus"></i> Nuevo</button></div></div><div id="formularios-table" class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Cargando...</span></div></div>');
                 $.ajax({
                     url: 'https://fercoadvancededucation.com/php-ferco-files-ws/forms',
                     method: 'GET',
@@ -348,7 +348,7 @@
                 var statusFilter = $('#filterStatus').val();
                 var countryFilter = $('#filterCountry').val();
                 var filteredData = formsData.filter(function(form) {
-                    var matchesSearch = form.name.toLowerCase().includes(searchTerm);
+                    var matchesSearch = form.name.toLowerCase().includes(searchTerm) || form.email.toLowerCase().includes(searchTerm);
                     var matchesStatus = statusFilter === '' || form.status.toString() === statusFilter;
                     var matchesCountry = countryFilter === '' || form.country === countryFilter;
                     return matchesSearch && matchesStatus && matchesCountry;
