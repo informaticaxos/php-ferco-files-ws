@@ -88,22 +88,25 @@ class FormRepository
      * Verifica si todos los files relacionados con un form tienen path no null
      *
      * @param int $idForm
-     * @return int 1 si todos los paths son válidos, 0 si alguno es null
+     * @return int 1 si todos los paths son válidos, 0 si alguno es null o no hay files
      */
     public function checkFormFilesStatus($idForm)
     {
         $stmt = $this->pdo->prepare("SELECT path FROM files WHERE fk_form = ?");
         $stmt->execute([$idForm]);
         $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $state = 1;
+
+        if (empty($files)) {
+            return 0; // No hay files, status pendiente
+        }
 
         foreach ($files as $file) {
             if (is_null($file['path']) || $file['path'] === '') {
-                $state = 0;
+                return 0; // Algún file sin path
             }
         }
 
-        return $state;
+        return 1; // Todos los files tienen path válido
     }
 
     /**
