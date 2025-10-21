@@ -58,10 +58,10 @@ class UserService
             return null; // Email ya existe
         }
 
-        // Contraseña sin hash (deshabilitado el cifrado)
-        $plainPassword = $data['password'];
+        // Hash de la contraseña
+        $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
 
-        $user = new User(null, $data['name'], $data['email'], $plainPassword, $data['state'] ?? '1');
+        $user = new User(null, $data['name'], $data['email'], $hashedPassword, $data['state'] ?? '1');
         $this->repository->save($user);
         return $user;
     }
@@ -91,9 +91,9 @@ class UserService
             return null; // Email ya existe en otro usuario
         }
 
-        $plainPassword = isset($data['password']) && !empty($data['password']) ? $data['password'] : $existing['password'];
+        $hashedPassword = isset($data['password']) && !empty($data['password']) ? password_hash($data['password'], PASSWORD_DEFAULT) : $existing['password'];
 
-        $user = new User($id, $data['name'], $data['email'], $plainPassword, $data['state'] ?? $existing['state']);
+        $user = new User($id, $data['name'], $data['email'], $hashedPassword, $data['state'] ?? $existing['state']);
         $this->repository->save($user);
         return $user;
     }
@@ -153,10 +153,10 @@ class UserService
         }
         $logs .= "4.3. User found: " . json_encode($user) . "\n";
 
-        // Comparación directa de contraseñas (sin hash)
-        $logs .= "5. Comparing passwords: input '" . $password . "' vs stored '" . $user['password'] . "'\n";
-        if ($password !== $user['password']) {
-            $logs .= "5.1. Password mismatch\n";
+        // Verificar contraseña con hash
+        $logs .= "5. Verifying password hash\n";
+        if (!password_verify($password, $user['password'])) {
+            $logs .= "5.1. Password verification failed\n";
             return null; // Contraseña incorrecta
         }
         $logs .= "5.2. Password match\n";
