@@ -135,6 +135,39 @@ class UserService
     }
 
     /**
+     * Actualiza la contraseña de un user
+     *
+     * @param int $id
+     * @param string $currentPassword
+     * @param string $newPassword
+     * @return User|null
+     */
+    public function updatePassword($id, $currentPassword, $newPassword)
+    {
+        $existing = $this->repository->findById($id);
+        if (!$existing) {
+            return null;
+        }
+
+        // Verificar contraseña actual
+        if (!password_verify($currentPassword, $existing['password'])) {
+            return null; // Contraseña actual incorrecta
+        }
+
+        // Validación básica para nueva contraseña
+        if (empty($newPassword) || strlen($newPassword) < 6) {
+            return null; // Nueva contraseña inválida
+        }
+
+        // Hash de la nueva contraseña
+        $hashedNewPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+
+        $user = new User($id, $existing['name'], $existing['email'], $hashedNewPassword, $existing['state']);
+        $this->repository->save($user);
+        return $user;
+    }
+
+    /**
      * Login de usuario
      *
      * @param string $email

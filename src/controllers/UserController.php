@@ -111,6 +111,29 @@ class UserController
     }
 
     /**
+     * Actualiza la contraseña de un user
+     *
+     * @param int $id
+     */
+    public function updatePassword($id)
+    {
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!$data || !isset($data['current_password']) || !isset($data['new_password'])) {
+            $this->sendResponse(400, 0, 'Invalid JSON data or missing current_password/new_password', null);
+            return;
+        }
+
+        $user = $this->service->updatePassword($id, $data['current_password'], $data['new_password']);
+        if ($user) {
+            $response = $user->toArray();
+            unset($response['password']); // No devolver contraseña
+            $this->sendResponse(200, 1, 'Password updated successfully', $response);
+        } else {
+            $this->sendResponse(400, 0, 'Invalid current password or user not found', null);
+        }
+    }
+
+    /**
      * Elimina un user por ID
      *
      * @param int $id

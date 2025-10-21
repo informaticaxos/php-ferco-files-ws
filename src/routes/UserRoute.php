@@ -14,4 +14,5 @@ $routes = [
     'DELETE /users/{id}' => ['UserController', 'delete'],
     'POST /login' => ['UserController', 'login'],
     'PUT /users/{id}/state' => ['UserController', 'updateState'],
+    'PUT /users/{id}/password' => ['UserController', 'updatePassword'],
 ];
