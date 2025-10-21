@@ -218,6 +218,7 @@
                         <input type="text" class="form-control" id="shareLink" readonly>
                         <button class="btn btn-outline-secondary btn-sm" type="button" id="copyLink"><i class="fas fa-copy"></i> Copiar enlace </button>
                         <button class="btn btn-primary btn-sm" id="openLink"><i class="fas fa-external-link-alt"></i> Abrir enlace en nueva ventana</button>
+                        <button class="btn btn-success btn-sm" id="shareWhatsApp"><i class="fab fa-whatsapp"></i> Compartir en WhatsApp</button>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -572,6 +573,8 @@
             window.shareFormModal = function(idForm) {
                 var shareUrl = 'https://fercoadvancededucation.com/php-ferco-files-ws/up-file/index.html?id_form=' + idForm;
                 $('#shareLink').val(shareUrl);
+                // Store the form ID for WhatsApp sharing
+                $('#shareFormModal').data('formId', idForm);
                 $('#shareFormModal').modal('show');
             };
 
@@ -600,6 +603,27 @@
             $('#openLink').click(function() {
                 var url = $('#shareLink').val();
                 window.open(url, '_blank');
+            });
+
+            // Share on WhatsApp
+            $('#shareWhatsApp').click(function() {
+                var formId = $('#shareFormModal').data('formId');
+                var shareUrl = $('#shareLink').val();
+                // Find the phone number from formsData
+                var form = formsData.find(function(f) {
+                    return f.id_form == formId;
+                });
+                if (form && form.phone) {
+                    var phone = form.phone.replace(/\D/g, ''); // Remove non-digits
+                    var whatsappUrl = 'https://wa.me/' + phone + '?text=' + encodeURIComponent('Aquí tienes el enlace para subir archivos: ' + shareUrl);
+                    window.open(whatsappUrl, '_blank');
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se encontró el número de teléfono para este formulario.'
+                    });
+                }
             });
 
             // Update form
