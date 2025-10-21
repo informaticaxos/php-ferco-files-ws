@@ -430,6 +430,17 @@
                 }
             });
 
+            // Open edit form modal
+            window.openEditFormModal = function(id, name, date, phone, country, email) {
+                $('#editFormId').val(id);
+                $('#editFormName').val(name);
+                $('#editFormDate').val(date);
+                $('#editFormPhone').val(phone);
+                $('#editFormCountry').val(country);
+                $('#editFormEmail').val(email);
+                $('#editFormModal').modal('show');
+            };
+
             // Open create file modal
             window.openCreateFileModal = function(fkForm) {
                 $('#fileFkForm').val(fkForm);
@@ -586,6 +597,55 @@
             $('#openLink').click(function() {
                 var url = $('#shareLink').val();
                 window.open(url, '_blank');
+            });
+
+            // Update form
+            $('#updateForm').click(function() {
+                var id = $('#editFormId').val();
+                var name = $('#editFormName').val();
+                var date = $('#editFormDate').val();
+                var phone = $('#editFormPhone').val();
+                var country = $('#editFormCountry').val();
+                var email = $('#editFormEmail').val();
+                if (name && date && phone && country && email) {
+                    $.ajax({
+                        url: 'https://fercoadvancededucation.com/php-ferco-files-ws/forms/' + id,
+                        method: 'PUT',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            name: name,
+                            date: date,
+                            phone: phone,
+                            country: country,
+                            email: email
+                        }),
+                        success: function(response) {
+                            Swal.fire({
+                                icon: response.status === 1 ? 'success' : 'error',
+                                title: response.status === 1 ? 'Éxito' : 'Error',
+                                text: response.message
+                            });
+                            if (response.status === 1) {
+                                $('#editFormModal').modal('hide');
+                                $('#editForm')[0].reset();
+                                loadFormularios(); // Reload the table
+                            }
+                        },
+                        error: function() {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Error de conexión.'
+                            });
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Campos requeridos',
+                        text: 'Por favor, complete todos los campos.'
+                    });
+                }
             });
 
             // Delete form
