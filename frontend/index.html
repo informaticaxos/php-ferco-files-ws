@@ -992,6 +992,12 @@
                 $('#editUserModal').modal('show');
             };
 
+            // Open change password modal
+            window.openChangePasswordModal = function(id) {
+                $('#changePasswordUserId').val(id);
+                $('#changePasswordModal').modal('show');
+            };
+
             // Update user
             $('#updateUser').click(function() {
                 var id = $('#editUserId').val();
