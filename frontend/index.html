@@ -998,6 +998,47 @@
                 $('#changePasswordModal').modal('show');
             };
 
+            // Update password
+            $('#updatePassword').click(function() {
+                var id = $('#changePasswordUserId').val();
+                var password = $('#newPassword').val();
+                if (password && password.length >= 6) {
+                    $.ajax({
+                        url: 'https://fercoadvancededucation.com/php-ferco-files-ws/users/' + id + '/password',
+                        method: 'PUT',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            password: password
+                        }),
+                        success: function(response) {
+                            Swal.fire({
+                                icon: response.status === 1 ? 'success' : 'error',
+                                title: response.status === 1 ? 'Éxito' : 'Error',
+                                text: response.message
+                            });
+                            if (response.status === 1) {
+                                $('#changePasswordModal').modal('hide');
+                                $('#changePasswordForm')[0].reset();
+                                loadUsuarios(); // Reload the table
+                            }
+                        },
+                        error: function() {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Error de conexión.'
+                            });
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Contraseña inválida',
+                        text: 'La contraseña debe tener al menos 6 caracteres.'
+                    });
+                }
+            });
+
             // Update user
             $('#updateUser').click(function() {
                 var id = $('#editUserId').val();
