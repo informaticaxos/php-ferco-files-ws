@@ -58,7 +58,7 @@ class FormService
             return null;
         }
 
-        $form = new Form(null, $data['name'], $data['date'], $data['status'] ?? 0, $data['phone'] ?? '', $data['country'] ?? '', $data['email'] ?? '');
+        $form = new Form(null, $data['name'], $data['date'], 0, $data['phone'] ?? '', $data['country'] ?? '', $data['email'] ?? '');
         $this->repository->save($form);
         return $form;
     }
