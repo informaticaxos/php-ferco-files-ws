@@ -87,7 +87,7 @@ class FormService
             return null;
         }
 
-        $form = new Form($id, $data['name'], $data['date'], $data['status'] ?? 0, $data['phone'] ?? $existing['phone'], $data['country'] ?? $existing['country'], $data['email'] ?? $existing['email']);
+        $form = new Form($id, $data['name'], $data['date'], $existing['status'], $data['phone'] ?? $existing['phone'], $data['country'] ?? $existing['country'], $data['email'] ?? $existing['email']);
         $this->repository->save($form);
         return $form;
     }

@@ -211,6 +211,45 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal for editing form -->
+    <div class="modal fade" id="editFormModal" tabindex="-1" aria-labelledby="editFormModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editFormModalLabel">Editar Formulario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm">
+                        <input type="hidden" id="editFormId">
+                        <div class="mb-3">
+                            <label for="editFormName" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="editFormName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editFormDate" class="form-label">Fecha</label>
+                            <input type="date" class="form-control" id="editFormDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editFormPhone" class="form-label">Teléfono</label>
+                            <input type="text" class="form-control" id="editFormPhone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editFormCountry" class="form-label">País</label>
+                            <input type="text" class="form-control" id="editFormCountry" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editFormEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="editFormEmail" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="updateForm">Actualizar</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -255,7 +294,7 @@
 
             // Load formularios
             function loadFormularios() {
-                $('#content-area').html('<h2>Formularios <button type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="modal" data-bs-target="#createFormModal"><i class="fas fa-file-plus"></i> Nuevo</button></h2><div class="d-flex justify-content-between mb-3"><div class="d-flex"><input type="text" id="searchName" class="form-control me-2" placeholder="Buscar por nombre"><select id="filterStatus" class="form-select me-2"><option value="">Todos los estados</option><option value="1">Completado</option><option value="0">Pendiente</option></select></div><button id="refreshBtn" class="btn btn-secondary"><i class="fas fa-sync"></i> Actualizar</button></div><div id="formularios-table" class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Cargando...</span></div></div>');
+                $('#content-area').html('<h2>Formularios</h2><div class="d-flex justify-content-between mb-3"><div class="d-flex"><input type="text" id="searchName" class="form-control me-2" placeholder="Buscar por nombre"><select id="filterStatus" class="form-select me-2"><option value="">Todos los estados</option><option value="1">Completado</option><option value="0">Pendiente</option></select></div><div><button id="refreshBtn" class="btn btn-secondary"><i class="fas fa-sync"></i> Actualizar</button><button type="button" class="btn btn-outline-dark btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#createFormModal"><i class="fas fa-file-plus"></i> Nuevo</button></div></div><div id="formularios-table" class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Cargando...</span></div></div>');
                 $.ajax({
                     url: 'https://fercoadvancededucation.com/php-ferco-files-ws/forms',
                     method: 'GET',
@@ -282,7 +321,7 @@
                     var matchesStatus = statusFilter === '' || form.status.toString() === statusFilter;
                     return matchesSearch && matchesStatus;
                 });
-                var table = '<table class="table table-striped"><thead><tr><th>ID</th><th>Nombre</th><th>Fecha</th><th>Estado</th><th>Archivos</th><th>Acciones</th></tr></thead><tbody>';
+                var table = '<table class="table table-striped"><thead><tr><th>ID</th><th>Nombre</th><th>Fecha</th><th>Teléfono</th><th>País</th><th>Email</th><th>Estado</th><th>Archivos</th><th>Acciones</th></tr></thead><tbody>';
                 filteredData.forEach(function(form) {
                     var statusText = form.status === 1 ? 'Completado' : 'Pendiente';
                     var statusIcon = form.status === 1 ? '<i class="fas fa-check-circle text-success"></i>' : '<i class="fas fa-exclamation-triangle text-warning"></i>';
@@ -294,10 +333,10 @@
                         async: false, // Sincronizar para obtener el conteo antes de construir la fila
                         success: function(fileResponse) {
                             var fileCount = fileResponse.status === 1 ? fileResponse.data.length : 0;
-                            table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + statusDisplay + '</td><td>' + fileCount + '</td><td><button class="btn btn-info btn-sm me-1" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i></button><button class="btn btn-secondary btn-sm me-1" onclick="viewFilesModal(' + form.id_form + ')"><i class="fas fa-list"></i></button><button class="btn btn-success btn-sm me-1" onclick="shareFormModal(' + form.id_form + ')"><i class="fas fa-share"></i></button><button class="btn btn-danger btn-sm" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i></button></td></tr>';
+                            table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + (form.phone || '') + '</td><td>' + (form.country || '') + '</td><td>' + (form.email || '') + '</td><td>' + statusDisplay + '</td><td>' + fileCount + '</td><td><button class="btn btn-warning btn-sm me-1" onclick="openEditFormModal(' + form.id_form + ', \'' + form.name.replace(/'/g, "\\'") + '\', \'' + form.date + '\', \'' + (form.phone || '') + '\', \'' + (form.country || '') + '\', \'' + (form.email || '') + '\')"><i class="fas fa-edit"></i></button><button class="btn btn-info btn-sm me-1" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i></button><button class="btn btn-secondary btn-sm me-1" onclick="viewFilesModal(' + form.id_form + ')"><i class="fas fa-list"></i></button><button class="btn btn-success btn-sm me-1" onclick="shareFormModal(' + form.id_form + ')"><i class="fas fa-share"></i></button><button class="btn btn-danger btn-sm" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i></button></td></tr>';
                         },
                         error: function() {
-                            table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + statusDisplay + '</td><td>0</td><td><button class="btn btn-info btn-sm me-1" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i></button><button class="btn btn-secondary btn-sm me-1" onclick="viewFilesModal(' + form.id_form + ')"><i class="fas fa-list"></i></button><button class="btn btn-success btn-sm me-1" onclick="shareFormModal(' + form.id_form + ')"><i class="fas fa-share"></i></button><button class="btn btn-danger btn-sm" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i></button></td></tr>';
+                            table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + (form.phone || '') + '</td><td>' + (form.country || '') + '</td><td>' + (form.email || '') + '</td><td>' + statusDisplay + '</td><td>0</td><td><button class="btn btn-warning btn-sm me-1" onclick="openEditFormModal(' + form.id_form + ', \'' + form.name.replace(/'/g, "\\'") + '\', \'' + form.date + '\', \'' + (form.phone || '') + '\', \'' + (form.country || '') + '\', \'' + (form.email || '') + '\')"><i class="fas fa-edit"></i></button><button class="btn btn-info btn-sm me-1" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i></button><button class="btn btn-secondary btn-sm me-1" onclick="viewFilesModal(' + form.id_form + ')"><i class="fas fa-list"></i></button><button class="btn btn-success btn-sm me-1" onclick="shareFormModal(' + form.id_form + ')"><i class="fas fa-share"></i></button><button class="btn btn-danger btn-sm" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i></button></td></tr>';
                         }
                     });
                 });
