@@ -304,19 +304,23 @@
             $(document).on('change', '#filterStatus', function() {
                 renderTable();
             });
+            $(document).on('change', '#filterCountry', function() {
+                renderTable();
+            });
             $(document).on('click', '#refreshBtn', function() {
                 loadFormularios();
             });
 
             // Load formularios
             function loadFormularios() {
-                $('#content-area').html('<h2>Formularios</h2><div class="d-flex justify-content-between mb-3"><div class="d-flex"><input type="text" id="searchName" class="form-control me-2" placeholder="Buscar por nombre"><select id="filterStatus" class="form-select me-2"><option value="">Todos los estados</option><option value="1">Completado</option><option value="0">Pendiente</option></select></div><div><button id="refreshBtn" class="btn btn-secondary"><i class="fas fa-sync"></i> Actualizar</button><button type="button" class="btn btn-outline-dark btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#createFormModal"><i class="fas fa-file-plus"></i> Nuevo</button></div></div><div id="formularios-table" class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Cargando...</span></div></div>');
+                $('#content-area').html('<h2>Formularios</h2><div class="d-flex justify-content-between mb-3"><div class="d-flex"><input type="text" id="searchName" class="form-control form-control-sm me-2" placeholder="Buscar por nombre"><select id="filterStatus" class="form-select form-select-sm me-2"><option value="">Todos los estados</option><option value="1">Completado</option><option value="0">Pendiente</option></select><select id="filterCountry" class="form-select form-select-sm me-2"><option value="">Todos los países</option></select></div><div><button id="refreshBtn" class="btn btn-secondary btn-sm"><i class="fas fa-sync"></i> Actualizar</button><button type="button" class="btn btn-outline-dark btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#createFormModal"><i class="fas fa-file-plus"></i> Nuevo</button></div></div><div id="formularios-table" class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Cargando...</span></div></div>');
                 $.ajax({
                     url: 'https://fercoadvancededucation.com/php-ferco-files-ws/forms',
                     method: 'GET',
                     success: function(response) {
                         if (response.status === 1) {
                             formsData = response.data; // Store the data
+                            populateCountryFilter();
                             renderTable();
                         } else {
                             $('#formularios-table').html('<p>Error al cargar formularios: ' + response.message + '</p>');
@@ -328,14 +332,26 @@
                 });
             }
 
+            // Populate country filter
+            function populateCountryFilter() {
+                var countries = [...new Set(formsData.map(form => form.country).filter(country => country))];
+                var options = '<option value="">Todos los países</option>';
+                countries.forEach(function(country) {
+                    options += '<option value="' + country + '">' + country + '</option>';
+                });
+                $('#filterCountry').html(options);
+            }
+
             // Render the table with filters
             function renderTable() {
                 var searchTerm = $('#searchName').val().toLowerCase();
                 var statusFilter = $('#filterStatus').val();
+                var countryFilter = $('#filterCountry').val();
                 var filteredData = formsData.filter(function(form) {
                     var matchesSearch = form.name.toLowerCase().includes(searchTerm);
                     var matchesStatus = statusFilter === '' || form.status.toString() === statusFilter;
-                    return matchesSearch && matchesStatus;
+                    var matchesCountry = countryFilter === '' || form.country === countryFilter;
+                    return matchesSearch && matchesStatus && matchesCountry;
                 });
                 var table = '<table class="table table-striped"><thead><tr><th>ID</th><th>Nombre</th><th>Fecha</th><th>Teléfono</th><th>País</th><th>Email</th><th>Estado</th><th>Archivos</th><th>Acciones</th></tr></thead><tbody>';
                 filteredData.forEach(function(form) {
@@ -352,7 +368,7 @@
                             table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + (form.phone || '') + '</td><td>' + (form.country || '') + '</td><td>' + (form.email || '') + '</td><td>' + statusDisplay + '</td><td>' + fileCount + '</td><td><button class="btn btn-warning btn-xs me-1" onclick="openEditFormModal(' + form.id_form + ', \'' + form.name.replace(/'/g, "\\'") + '\', \'' + form.date + '\', \'' + (form.phone || '') + '\', \'' + (form.country || '') + '\', \'' + (form.email || '') + '\')"><i class="fas fa-edit"></i> Edit</button><button class="btn btn-info btn-xs me-1" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i> Assign File</button><button class="btn btn-secondary btn-xs me-1" onclick="viewFilesModal(' + form.id_form + ')"><i class="fas fa-list"></i> Files</button><button class="btn btn-success btn-xs me-1" onclick="shareFormModal(' + form.id_form + ')"><i class="fas fa-share"></i> Share </button><button class="btn btn-danger btn-xs" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i> Delete</button></td></tr>';
                         },
                         error: function() {
-                            table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + (form.phone || '') + '</td><td>' + (form.country || '') + '</td><td>' + (form.email || '') + '</td><td>' + statusDisplay + '</td><td>0</td><td><button class="btn btn-warning btn-xs me-1" onclick="openEditFormModal(' + form.id_form + ', \'' + form.name.replace(/'/g, "\\'") + '\', \'' + form.date + '\', \'' + (form.phone || '') + '\', \'' + (form.country || '') + '\', \'' + (form.email || '') + '\')"><i class="fas fa-edit"></i></button><button class="btn btn-info btn-xs me-1" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i></button>Assign File<button class="btn btn-secondary btn-xs me-1" onclick="viewFilesModal(' + form.id_form + ')"><i class="fas fa-list"></i></button><button class="btn btn-success btn-xs me-1" onclick="shareFormModal(' + form.id_form + ')"><i class="fas fa-share"></i></button><button class="btn btn-danger btn-xs" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i></button></td></tr>';
+                            table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + (form.phone || '') + '</td><td>' + (form.country || '') + '</td><td>' + (form.email || '') + '</td><td>' + statusDisplay + '</td><td>0</td><td><button class="btn btn-warning btn-xs me-1" onclick="openEditFormModal(' + form.id_form + ', \'' + form.name.replace(/'/g, "\\'") + '\', \'' + form.date + '\', \'' + (form.phone || '') + '\', \'' + (form.country || '') + '\', \'' + (form.email || '') + '\')"><i class="fas fa-edit"></i> Edit</button><button class="btn btn-info btn-xs me-1" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i> Assign File</button><button class="btn btn-secondary btn-xs me-1" onclick="viewFilesModal(' + form.id_form + ')"><i class="fas fa-list"></i> Files</button><button class="btn btn-success btn-xs me-1" onclick="shareFormModal(' + form.id_form + ')"><i class="fas fa-share"></i> Share</button><button class="btn btn-danger btn-xs" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i> Delete</button></td></tr>';
                         }
                     });
                 });
