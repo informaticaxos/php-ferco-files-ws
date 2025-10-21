@@ -52,20 +52,26 @@ class FormRepository
     {
         if ($form->getIdForm()) {
             // Actualizar
-            $stmt = $this->pdo->prepare("UPDATE forms SET name = ?, date = ?, status = ? WHERE id_form = ?");
+            $stmt = $this->pdo->prepare("UPDATE forms SET name = ?, date = ?, status = ?, phone = ?, country = ?, email = ? WHERE id_form = ?");
             $stmt->execute([
                 $form->getName(),
                 $form->getDate(),
                 $form->getStatus(),
+                $form->getPhone(),
+                $form->getCountry(),
+                $form->getEmail(),
                 $form->getIdForm()
             ]);
         } else {
             // Insertar
-            $stmt = $this->pdo->prepare("INSERT INTO forms (name, date, status) VALUES (?, ?, ?)");
+            $stmt = $this->pdo->prepare("INSERT INTO forms (name, date, status, phone, country, email) VALUES (?, ?, ?, ?, ?, ?)");
             $stmt->execute([
                 $form->getName(),
                 $form->getDate(),
-                $form->getStatus()
+                $form->getStatus(),
+                $form->getPhone(),
+                $form->getCountry(),
+                $form->getEmail()
             ]);
             $form->setIdForm($this->pdo->lastInsertId());
         }

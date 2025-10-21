@@ -1,10 +1,8 @@
-# TODO: Agregar funcionalidad de la tabla 'countries' con getAllCountries
+# TODO: Actualizar funcionalidad de 'forms' agregando phone, country y email
 
-- [x] Crear src/models/CountriesModel.php
-- [x] Crear src/repositories/CountriesRepository.php
-- [x] Crear src/services/CountriesService.php
-- [x] Crear src/controllers/CountriesController.php
-- [x] Crear src/routes/CountriesRoute.php
-- [x] Modificar index.php para incluir rutas y controlador de countries
-- [ ] Verificar que la nueva ruta funcione correctamente (prueba manual requerida)
-- [ ] Probar el endpoint GET /countries (prueba manual requerida)
+- [x] Actualizar src/models/FormModel.php
+- [x] Actualizar src/repositories/FormRepository.php
+- [x] Actualizar src/services/FormService.php
+- [x] Actualizar src/controllers/FormController.php (no requiere cambios, ya que maneja JSON genérico)
+- [ ] Verificar que el endpoint POST /forms funcione con el nuevo payload
+- [ ] Probar el endpoint POST /forms con el nuevo formato

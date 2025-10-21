@@ -58,7 +58,7 @@ class FormService
             return null;
         }
 
-        $form = new Form(null, $data['name'], $data['date'], $data['status'] ?? 0);
+        $form = new Form(null, $data['name'], $data['date'], $data['status'] ?? 0, $data['phone'] ?? '', $data['country'] ?? '', $data['email'] ?? '');
         $this->repository->save($form);
         return $form;
     }
@@ -87,7 +87,7 @@ class FormService
             return null;
         }
 
-        $form = new Form($id, $data['name'], $data['date'], $data['status'] ?? 0);
+        $form = new Form($id, $data['name'], $data['date'], $data['status'] ?? 0, $data['phone'] ?? $existing['phone'], $data['country'] ?? $existing['country'], $data['email'] ?? $existing['email']);
         $this->repository->save($form);
         return $form;
     }
@@ -106,7 +106,7 @@ class FormService
             return null;
         }
 
-        $form = new Form($id, $existing['name'], $existing['date'], $state);
+        $form = new Form($id, $existing['name'], $existing['date'], $state, $existing['phone'], $existing['country'], $existing['email']);
         $this->repository->save($form);
         return $form;
     }
