@@ -319,8 +319,22 @@
                     success: function(response) {
                         if (response.status === 1) {
                             formsData = response.data; // Store the data
-                            populateCountryFilter();
-                            renderTable();
+                            // Fetch file counts asynchronously for all forms
+                            var promises = formsData.map(function(form) {
+                                return $.ajax({
+                                    url: 'https://fercoadvancededucation.com/php-ferco-files-ws/files/form/' + form.id_form,
+                                    method: 'GET'
+                                }).then(function(fileResponse) {
+                                    form.fileCount = fileResponse.status === 1 ? fileResponse.data.length : 0;
+                                }).catch(function() {
+                                    form.fileCount = 0;
+                                });
+                            });
+                            // Wait for all file counts to be fetched
+                            $.when.apply($, promises).then(function() {
+                                populateCountryFilter();
+                                renderTable();
+                            });
                         } else {
                             $('#formularios-table').html('<p>Error al cargar formularios: ' + response.message + '</p>');
                         }
@@ -357,19 +371,8 @@
                     var statusText = form.status === 1 ? 'Completado' : 'Pendiente';
                     var statusIcon = form.status === 1 ? '<i class="fas fa-check-circle text-success"></i>' : '<i class="fas fa-exclamation-triangle text-warning"></i>';
                     var statusDisplay = statusIcon + ' ' + statusText;
-                    // Consultar archivos para este form
-                    $.ajax({
-                        url: 'https://fercoadvancededucation.com/php-ferco-files-ws/files/form/' + form.id_form,
-                        method: 'GET',
-                        async: false, // Sincronizar para obtener el conteo antes de construir la fila
-                        success: function(fileResponse) {
-                            var fileCount = fileResponse.status === 1 ? fileResponse.data.length : 0;
-                            table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + (form.phone || '') + '</td><td>' + (form.country || '') + '</td><td>' + (form.email || '') + '</td><td>' + statusDisplay + '</td><td>' + fileCount + '</td><td><button class="btn btn-warning btn-xs me-1" onclick="openEditFormModal(' + form.id_form + ', \'' + form.name.replace(/'/g, "\\'") + '\', \'' + form.date + '\', \'' + (form.phone || '') + '\', \'' + (form.country || '') + '\', \'' + (form.email || '') + '\')"><i class="fas fa-edit"></i> Edit</button><button class="btn btn-info btn-xs me-1" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i> Assign File</button><button class="btn btn-secondary btn-xs me-1" onclick="viewFilesModal(' + form.id_form + ')"><i class="fas fa-list"></i> Files</button><button class="btn btn-success btn-xs me-1" onclick="shareFormModal(' + form.id_form + ')"><i class="fas fa-share"></i> Share </button><button class="btn btn-danger btn-xs" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i> Delete</button></td></tr>';
-                        },
-                        error: function() {
-                            table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + (form.phone || '') + '</td><td>' + (form.country || '') + '</td><td>' + (form.email || '') + '</td><td>' + statusDisplay + '</td><td>0</td><td><button class="btn btn-warning btn-xs me-1" onclick="openEditFormModal(' + form.id_form + ', \'' + form.name.replace(/'/g, "\\'") + '\', \'' + form.date + '\', \'' + (form.phone || '') + '\', \'' + (form.country || '') + '\', \'' + (form.email || '') + '\')"><i class="fas fa-edit"></i> Edit</button><button class="btn btn-info btn-xs me-1" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i> Assign File</button><button class="btn btn-secondary btn-xs me-1" onclick="viewFilesModal(' + form.id_form + ')"><i class="fas fa-list"></i> Files</button><button class="btn btn-success btn-xs me-1" onclick="shareFormModal(' + form.id_form + ')"><i class="fas fa-share"></i> Share</button><button class="btn btn-danger btn-xs" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i> Delete</button></td></tr>';
-                        }
-                    });
+                    var fileCount = form.fileCount || 0;
+                    table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + (form.phone || '') + '</td><td>' + (form.country || '') + '</td><td>' + (form.email || '') + '</td><td>' + statusDisplay + '</td><td>' + fileCount + '</td><td><button class="btn btn-warning btn-xs me-1" onclick="openEditFormModal(' + form.id_form + ', \'' + form.name.replace(/'/g, "\\'") + '\', \'' + form.date + '\', \'' + (form.phone || '') + '\', \'' + (form.country || '') + '\', \'' + (form.email || '') + '\')"><i class="fas fa-edit"></i> Edit</button><button class="btn btn-info btn-xs me-1" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i> Assign File</button><button class="btn btn-secondary btn-xs me-1" onclick="viewFilesModal(' + form.id_form + ')"><i class="fas fa-list"></i> Files</button><button class="btn btn-success btn-xs me-1" onclick="shareFormModal(' + form.id_form + ')"><i class="fas fa-share"></i> Share </button><button class="btn btn-danger btn-xs" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i> Delete</button></td></tr>';
                 });
                 table += '</tbody></table>';
                 $('#formularios-table').html(table);
