@@ -345,11 +345,8 @@
                             <input type="email" class="form-control" id="userEmail" required>
                         </div>
                         <div class="mb-3">
-                            <label for="userRole" class="form-label">Rol</label>
-                            <select class="form-control" id="userRole" required>
-                                <option value="user">User</option>
-                                <option value="admin">Admin</option>
-                            </select>
+                            <label for="userPassword" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="userPassword" required>
                         </div>
                     </form>
                 </div>
@@ -484,7 +481,7 @@
 
             // Load usuarios
             function loadUsuarios() {
-                $('#content-area').html('<h2>Usuarios</h2><div class="d-flex justify-content-between mb-3"><div class="d-flex"><input type="text" id="searchUserName" class="form-control form-control-sm me-2" placeholder="Buscar por nombre"><select id="filterRole" class="form-select form-select-sm me-2"><option value="">Todos los roles</option><option value="admin">Admin</option><option value="user">User</option></select></div><div><button id="refreshUsersBtn" class="btn btn-secondary btn-sm"><i class="fas fa-sync"></i> Actualizar</button><button type="button" class="btn btn-outline-dark btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#createUserModal"><i class="fas fa-user-plus"></i> Nuevo</button></div></div><div id="usuarios-table" class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Cargando...</span></div></div>');
+                $('#content-area').html('<h2>Usuarios</h2><div class="d-flex justify-content-between mb-3"><div class="d-flex"><input type="text" id="searchUserName" class="form-control form-control-sm me-2" placeholder="Buscar por nombre"></div><div><button id="refreshUsersBtn" class="btn btn-secondary btn-sm"><i class="fas fa-sync"></i> Actualizar</button><button type="button" class="btn btn-outline-dark btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#createUserModal"><i class="fas fa-user-plus"></i> Nuevo</button></div></div><div id="usuarios-table" class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Cargando...</span></div></div>');
                 $.ajax({
                     url: 'https://fercoadvancededucation.com/php-ferco-files-ws/users',
                     method: 'GET',
@@ -928,8 +925,8 @@
             $('#saveUser').click(function() {
                 var name = $('#userName').val();
                 var email = $('#userEmail').val();
-                var role = $('#userRole').val();
-                if (name && email && role) {
+                var password = $('#userPassword').val();
+                if (name && email && password) {
                     $.ajax({
                         url: 'https://fercoadvancededucation.com/php-ferco-files-ws/users',
                         method: 'POST',
@@ -937,7 +934,7 @@
                         data: JSON.stringify({
                             name: name,
                             email: email,
-                            role: role
+                            password: password
                         }),
                         success: function(response) {
                             Swal.fire({
