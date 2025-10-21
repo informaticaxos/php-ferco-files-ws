@@ -58,10 +58,10 @@ class UserService
             return null; // Email ya existe
         }
 
-        // Hash de la contraseña
-        $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
+        // Contraseña sin hash (deshabilitado el cifrado)
+        $plainPassword = $data['password'];
 
-        $user = new User(null, $data['name'], $data['email'], $hashedPassword, $data['state'] ?? '1');
+        $user = new User(null, $data['name'], $data['email'], $plainPassword, $data['state'] ?? '1');
         $this->repository->save($user);
         return $user;
     }
@@ -91,9 +91,9 @@ class UserService
             return null; // Email ya existe en otro usuario
         }
 
-        $hashedPassword = isset($data['password']) && !empty($data['password']) ? password_hash($data['password'], PASSWORD_DEFAULT) : $existing['password'];
+        $plainPassword = isset($data['password']) && !empty($data['password']) ? $data['password'] : $existing['password'];
 
-        $user = new User($id, $data['name'], $data['email'], $hashedPassword, $data['state'] ?? $existing['state']);
+        $user = new User($id, $data['name'], $data['email'], $plainPassword, $data['state'] ?? $existing['state']);
         $this->repository->save($user);
         return $user;
     }
@@ -148,7 +148,8 @@ class UserService
             return null; // Usuario no encontrado
         }
 
-        if (!password_verify($password, $user['password'])) {
+        // Comparación directa de contraseñas (sin hash)
+        if ($password !== $user['password']) {
             return null; // Contraseña incorrecta
         }
 
