@@ -210,6 +210,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function() {
+            var formsData = []; // Store the forms data globally
+
             // Handle sidebar navigation
             $('.sidebar .nav-link, .offcanvas .nav-link').click(function(e) {
                 e.preventDefault();
@@ -230,10 +232,10 @@
 
             // Event listeners for search and filter
             $(document).on('input', '#searchName', function() {
-                loadFormularios();
+                renderTable();
             });
             $(document).on('change', '#filterStatus', function() {
-                loadFormularios();
+                renderTable();
             });
             $(document).on('click', '#refreshBtn', function() {
                 loadFormularios();
@@ -247,34 +249,8 @@
                     method: 'GET',
                     success: function(response) {
                         if (response.status === 1) {
-                            var searchTerm = $('#searchName').val().toLowerCase();
-                            var statusFilter = $('#filterStatus').val();
-                            var filteredData = response.data.filter(function(form) {
-                                var matchesSearch = form.name.toLowerCase().includes(searchTerm);
-                                var matchesStatus = statusFilter === '' || form.status.toString() === statusFilter;
-                                return matchesSearch && matchesStatus;
-                            });
-                            var table = '<table class="table table-striped"><thead><tr><th>ID</th><th>Nombre</th><th>Fecha</th><th>Estado</th><th>Archivos</th><th>Acciones</th></tr></thead><tbody>';
-                            filteredData.forEach(function(form) {
-                                var statusText = form.status === 1 ? 'Completado' : 'Pendiente';
-                                var statusIcon = form.status === 1 ? '<i class="fas fa-check-circle text-success"></i>' : '<i class="fas fa-exclamation-triangle text-warning"></i>';
-                                var statusDisplay = statusIcon + ' ' + statusText;
-                                // Consultar archivos para este form
-                                $.ajax({
-                                    url: 'https://fercoadvancededucation.com/php-ferco-files-ws/files/form/' + form.id_form,
-                                    method: 'GET',
-                                    async: false, // Sincronizar para obtener el conteo antes de construir la fila
-                                    success: function(fileResponse) {
-                                        var fileCount = fileResponse.status === 1 ? fileResponse.data.length : 0;
-                                        table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + statusDisplay + '</td><td>' + fileCount + '</td><td><button class="btn btn-info btn-sm me-1" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i></button><button class="btn btn-secondary btn-sm me-1" onclick="viewFilesModal(' + form.id_form + ')"><i class="fas fa-list"></i></button><button class="btn btn-success btn-sm me-1" onclick="shareFormModal(' + form.id_form + ')"><i class="fas fa-share"></i></button><button class="btn btn-danger btn-sm" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i></button></td></tr>';
-                                    },
-                                    error: function() {
-                                        table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + statusDisplay + '</td><td>0</td><td><button class="btn btn-info btn-sm me-1" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i></button><button class="btn btn-secondary btn-sm me-1" onclick="viewFilesModal(' + form.id_form + ')"><i class="fas fa-list"></i></button><button class="btn btn-success btn-sm me-1" onclick="shareFormModal(' + form.id_form + ')"><i class="fas fa-share"></i></button><button class="btn btn-danger btn-sm" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i></button></td></tr>';
-                                    }
-                                });
-                            });
-                            table += '</tbody></table>';
-                            $('#formularios-table').html(table);
+                            formsData = response.data; // Store the data
+                            renderTable();
                         } else {
                             $('#formularios-table').html('<p>Error al cargar formularios: ' + response.message + '</p>');
                         }
@@ -283,6 +259,38 @@
                         $('#formularios-table').html('<p>Error de conexión.</p>');
                     }
                 });
+            }
+
+            // Render the table with filters
+            function renderTable() {
+                var searchTerm = $('#searchName').val().toLowerCase();
+                var statusFilter = $('#filterStatus').val();
+                var filteredData = formsData.filter(function(form) {
+                    var matchesSearch = form.name.toLowerCase().includes(searchTerm);
+                    var matchesStatus = statusFilter === '' || form.status.toString() === statusFilter;
+                    return matchesSearch && matchesStatus;
+                });
+                var table = '<table class="table table-striped"><thead><tr><th>ID</th><th>Nombre</th><th>Fecha</th><th>Estado</th><th>Archivos</th><th>Acciones</th></tr></thead><tbody>';
+                filteredData.forEach(function(form) {
+                    var statusText = form.status === 1 ? 'Completado' : 'Pendiente';
+                    var statusIcon = form.status === 1 ? '<i class="fas fa-check-circle text-success"></i>' : '<i class="fas fa-exclamation-triangle text-warning"></i>';
+                    var statusDisplay = statusIcon + ' ' + statusText;
+                    // Consultar archivos para este form
+                    $.ajax({
+                        url: 'https://fercoadvancededucation.com/php-ferco-files-ws/files/form/' + form.id_form,
+                        method: 'GET',
+                        async: false, // Sincronizar para obtener el conteo antes de construir la fila
+                        success: function(fileResponse) {
+                            var fileCount = fileResponse.status === 1 ? fileResponse.data.length : 0;
+                            table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + statusDisplay + '</td><td>' + fileCount + '</td><td><button class="btn btn-info btn-sm me-1" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i></button><button class="btn btn-secondary btn-sm me-1" onclick="viewFilesModal(' + form.id_form + ')"><i class="fas fa-list"></i></button><button class="btn btn-success btn-sm me-1" onclick="shareFormModal(' + form.id_form + ')"><i class="fas fa-share"></i></button><button class="btn btn-danger btn-sm" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i></button></td></tr>';
+                        },
+                        error: function() {
+                            table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + statusDisplay + '</td><td>0</td><td><button class="btn btn-info btn-sm me-1" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i></button><button class="btn btn-secondary btn-sm me-1" onclick="viewFilesModal(' + form.id_form + ')"><i class="fas fa-list"></i></button><button class="btn btn-success btn-sm me-1" onclick="shareFormModal(' + form.id_form + ')"><i class="fas fa-share"></i></button><button class="btn btn-danger btn-sm" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i></button></td></tr>';
+                        }
+                    });
+                });
+                table += '</tbody></table>';
+                $('#formularios-table').html(table);
             }
 
             // Set current date on modal show
