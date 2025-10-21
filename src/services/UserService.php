@@ -139,27 +139,39 @@ class UserService
      *
      * @param string $email
      * @param string $password
+     * @param string &$logs
      * @return array|null
      */
-    public function login($email, $password)
+    public function login($email, $password, &$logs)
     {
+        $logs .= "4. UserService::login called\n";
+        $logs .= "4.1. Calling UserRepository::findByEmail with email: " . $email . "\n";
         $user = $this->repository->findByEmail($email);
         if (!$user) {
+            $logs .= "4.2. User not found in repository\n";
             return null; // Usuario no encontrado
         }
+        $logs .= "4.3. User found: " . json_encode($user) . "\n";
 
         // Comparación directa de contraseñas (sin hash)
+        $logs .= "5. Comparing passwords: input '" . $password . "' vs stored '" . $user['password'] . "'\n";
         if ($password !== $user['password']) {
+            $logs .= "5.1. Password mismatch\n";
             return null; // Contraseña incorrecta
         }
+        $logs .= "5.2. Password match\n";
 
         // Verificar estado
+        $logs .= "5.3. Checking user state: " . $user['state'] . "\n";
         if ($user['state'] !== '1') {
+            $logs .= "5.4. User inactive\n";
             return null; // Usuario inactivo
         }
+        $logs .= "5.5. User active\n";
 
         // Retornar datos del usuario sin contraseña
         unset($user['password']);
+        $logs .= "5.6. Returning user data without password\n";
         return $user;
     }
 }
