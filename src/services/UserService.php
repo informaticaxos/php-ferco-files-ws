@@ -163,7 +163,7 @@ class UserService
 
         // Verificar estado
         $logs .= "5.3. Checking user state: " . $user['state'] . "\n";
-        if ($user['state'] !== '1') {
+        if ($user['state'] != 1) {
             $logs .= "5.4. User inactive\n";
             return null; // Usuario inactivo
         }
