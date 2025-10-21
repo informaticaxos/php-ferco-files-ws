@@ -54,6 +54,10 @@ class FilesService
 
         $file = new Files(null, $data['title'], $data['description'] ?? '', $data['type'] ?? '', $data['path'] ?? '', $data['fk_form']);
         $this->filesRepository->save($file);
+
+        // Actualizar el status del form después de crear el file
+        $this->updateFormStatus($data['fk_form']);
+
         return $file;
     }
 
@@ -119,26 +123,8 @@ class FilesService
         // Obtener el fk_form del archivo
         $fkForm = $existing['fk_form'];
 
-        // Buscar todos los files relacionados con ese form
-        $allFiles = $this->filesRepository->findAllByIdForm($fkForm);
-
-        // Verificar uno a uno si path cumple la condición (no null o vacío)
-        $allPathsValid = true;
-        foreach ($allFiles as $fileItem) {
-            if (empty($fileItem['path'])) {
-                $allPathsValid = false;
-                break;
-            }
-        }
-
-        // Si todos los files del form tienen path válido, cambiar status del form a 1 (completado)
-        // De lo contrario, si no todos tienen path válido, cambiar status a 0 (pendiente)
-        $form = $this->formRepository->findById($fkForm);
-        if ($form) {
-            $newStatus = $allPathsValid ? 1 : 0;
-            $formObj = new Form($form['id_form'], $form['name'], $form['date'], $newStatus, $form['phone'], $form['country'], $form['email']);
-            $this->formRepository->save($formObj);
-        }
+        // Actualizar el status del form después de actualizar el file
+        $this->updateFormStatus($fkForm);
 
         return $file;
     }
@@ -158,6 +144,34 @@ class FilesService
             }
         }
         return $files;
+    }
+
+    /**
+     * Actualiza el status del form basado en los files relacionados
+     *
+     * @param int $fkForm
+     */
+    private function updateFormStatus($fkForm)
+    {
+        // Buscar todos los files relacionados con ese form
+        $allFiles = $this->filesRepository->findAllByIdForm($fkForm);
+
+        // Verificar uno a uno si path cumple la condición (no null, no vacío y longitud >= 10)
+        $allPathsValid = true;
+        foreach ($allFiles as $fileItem) {
+            if (is_null($fileItem['path']) || $fileItem['path'] === '' || strlen($fileItem['path']) < 10) {
+                $allPathsValid = false;
+                break;
+            }
+        }
+
+        // Actualizar el status del form: 1 si todos completos, 0 si no
+        $form = $this->formRepository->findById($fkForm);
+        if ($form) {
+            $newStatus = $allPathsValid ? 1 : 0;
+            $formObj = new Form($form['id_form'], $form['name'], $form['date'], $newStatus, $form['phone'], $form['country'], $form['email']);
+            $this->formRepository->save($formObj);
+        }
     }
 
     /**
@@ -194,23 +208,8 @@ class FilesService
         $deleted = $this->filesRepository->delete($id);
 
         if ($deleted) {
-            // Después de eliminar, verificar si todos los files restantes del form tienen path válido
-            $allFiles = $this->filesRepository->findAllByIdForm($fkForm);
-            $allPathsValid = true;
-            foreach ($allFiles as $fileItem) {
-                if (empty($fileItem['path'])) {
-                    $allPathsValid = false;
-                    break;
-                }
-            }
-
-            // Actualizar el status del form: 1 si todos completos, 0 si no
-            $form = $this->formRepository->findById($fkForm);
-            if ($form) {
-                $newStatus = $allPathsValid ? 1 : 0;
-                $formObj = new Form($form['id_form'], $form['name'], $form['date'], $newStatus, $form['phone'], $form['country'], $form['email']);
-                $this->formRepository->save($formObj);
-            }
+            // Actualizar el status del form después de eliminar el file
+            $this->updateFormStatus($fkForm);
         }
 
         return $deleted;
