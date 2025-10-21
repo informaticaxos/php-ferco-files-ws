@@ -75,6 +75,34 @@ class FormRepository
             ]);
             $form->setIdForm($this->pdo->lastInsertId());
         }
+
+        // Ejecutar checkFormFilesStatus y actualizar el status del form
+        $newStatus = $this->checkFormFilesStatus($form->getIdForm());
+        $form->setStatus($newStatus);
+        // Actualizar el status en la BD
+        $stmt = $this->pdo->prepare("UPDATE forms SET status = ? WHERE id_form = ?");
+        $stmt->execute([$newStatus, $form->getIdForm()]);
+    }
+
+    /**
+     * Verifica si todos los files relacionados con un form tienen path no null
+     *
+     * @param int $idForm
+     * @return int 1 si todos los paths son válidos, 0 si alguno es null
+     */
+    public function checkFormFilesStatus($idForm)
+    {
+        $stmt = $this->pdo->prepare("SELECT path FROM files WHERE fk_form = ?");
+        $stmt->execute([$idForm]);
+        $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($files as $file) {
+            if (is_null($file['path']) || $file['path'] === '') {
+                return 0;
+            }
+        }
+
+        return 1;
     }
 
     /**
