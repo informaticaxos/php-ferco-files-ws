@@ -12,11 +12,15 @@ $filesRoutes = $routes;
 require_once 'src/routes/CountriesRoute.php';
 $countriesRoutes = $routes;
 
-$routes = array_merge($formRoutes, $filesRoutes, $countriesRoutes);
+require_once 'src/routes/UserRoute.php';
+$userRoutes = $routes;
+
+$routes = array_merge($formRoutes, $filesRoutes, $countriesRoutes, $userRoutes);
 
 require_once 'src/controllers/FormController.php';
 require_once 'src/controllers/FilesController.php';
 require_once 'src/controllers/CountriesController.php';
+require_once 'src/controllers/UserController.php';
 
 // Función para obtener el método y path de la solicitud
 function getRequestMethodAndPath()
