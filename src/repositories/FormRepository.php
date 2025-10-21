@@ -95,14 +95,15 @@ class FormRepository
         $stmt = $this->pdo->prepare("SELECT path FROM files WHERE fk_form = ?");
         $stmt->execute([$idForm]);
         $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $state = 1;
 
         foreach ($files as $file) {
             if (is_null($file['path']) || $file['path'] === '') {
-                return 0;
+                $state = 0;
             }
         }
 
-        return 1;
+        return $state;
     }
 
     /**
