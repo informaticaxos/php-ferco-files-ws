@@ -130,23 +130,17 @@ class UserController
      */
     public function login()
     {
-        $logs = "";
         $data = json_decode(file_get_contents('php://input'), true);
-        $logs .= "1. Received JSON data: " . json_encode($data) . "\n";
         if (!$data || !isset($data['email']) || !isset($data['password'])) {
-            $logs .= "2. Invalid JSON or missing email/password\n";
-            $this->sendResponse(400, 0, 'Invalid JSON data or missing email/password', null, $logs);
+            $this->sendResponse(400, 0, 'Invalid JSON data or missing email/password', null);
             return;
         }
 
-        $logs .= "3. Calling UserService::login with email: " . $data['email'] . "\n";
-        $user = $this->service->login($data['email'], $data['password'], $logs);
+        $user = $this->service->login($data['email'], $data['password']);
         if ($user) {
-            $logs .= "6. Login successful, user found\n";
-            $this->sendResponse(200, 1, 'Login successful', $user, $logs);
+            $this->sendResponse(200, 1, 'Login successful', $user);
         } else {
-            $logs .= "6. Login failed, invalid credentials or user inactive\n";
-            $this->sendResponse(401, 0, 'Invalid credentials or user inactive', null, $logs);
+            $this->sendResponse(401, 0, 'Invalid credentials or user inactive', null);
         }
     }
 
@@ -157,17 +151,15 @@ class UserController
      * @param int $status
      * @param string $message
      * @param mixed $data
-     * @param string $logs
      */
-    private function sendResponse($httpStatus, $status, $message, $data, $logs = "")
+    private function sendResponse($httpStatus, $status, $message, $data)
     {
         http_response_code($httpStatus);
         header('Content-Type: application/json');
         echo json_encode([
             'status' => $status,
             'message' => $message,
-            'data' => $data,
-            'logs' => $logs
+            'data' => $data
         ]);
         exit;
     }
