@@ -132,12 +132,12 @@ class FilesService
         }
 
         // Si todos los files del form tienen path válido, cambiar status del form a 1 (completado)
-        if ($allPathsValid) {
-            $form = $this->formRepository->findById($fkForm);
-            if ($form) {
-                $formObj = new Form($form['id_form'], $form['name'], $form['date'], 1);
-                $this->formRepository->save($formObj);
-            }
+        // De lo contrario, si no todos tienen path válido, cambiar status a 0 (pendiente)
+        $form = $this->formRepository->findById($fkForm);
+        if ($form) {
+            $newStatus = $allPathsValid ? 1 : 0;
+            $formObj = new Form($form['id_form'], $form['name'], $form['date'], $newStatus, $form['phone'], $form['country'], $form['email']);
+            $this->formRepository->save($formObj);
         }
 
         return $file;
@@ -174,6 +174,9 @@ class FilesService
             return false;
         }
 
+        // Obtener el fk_form antes de eliminar
+        $fkForm = $existing['fk_form'];
+
         // Si hay un archivo asociado, renombrarlo anteponiendo el ID
         if (!empty($existing['path'])) {
             $oldFilePath = __DIR__ . '/../../' . $existing['path'];
@@ -188,6 +191,28 @@ class FilesService
         }
 
         // Eliminar el registro de la BD
-        return $this->filesRepository->delete($id);
+        $deleted = $this->filesRepository->delete($id);
+
+        if ($deleted) {
+            // Después de eliminar, verificar si todos los files restantes del form tienen path válido
+            $allFiles = $this->filesRepository->findAllByIdForm($fkForm);
+            $allPathsValid = true;
+            foreach ($allFiles as $fileItem) {
+                if (empty($fileItem['path'])) {
+                    $allPathsValid = false;
+                    break;
+                }
+            }
+
+            // Actualizar el status del form: 1 si todos completos, 0 si no
+            $form = $this->formRepository->findById($fkForm);
+            if ($form) {
+                $newStatus = $allPathsValid ? 1 : 0;
+                $formObj = new Form($form['id_form'], $form['name'], $form['date'], $newStatus, $form['phone'], $form['country'], $form['email']);
+                $this->formRepository->save($formObj);
+            }
+        }
+
+        return $deleted;
     }
 }
