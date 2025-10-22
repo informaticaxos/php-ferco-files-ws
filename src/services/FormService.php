@@ -163,19 +163,18 @@ class FormService
             <title>Email from FERCO ADVANCED EDUCATION</title>
         </head>
         <body>
-            <img src='{$logoUrl}' alt='FERCO Logo' style='width:200px;'>
             <p>Hola {$form['name']},</p>
             <p>Aquí se encuentra tu enlace para que puedas subir los documentos solicitados por FERCO ADVANCED EDUCATION:</p>
             <p><a href='{$link}'>{$link}</a></p>
             <p>Saludos,<br>Equipo de FERCO ADVANCED EDUCATION</p>
             <p>
                 CORONEL CARDENAS CHRISTIAN FERNANDO<br>
-                Asesora de Vinculación Internacional<br>
+                Asesor de Vinculación Internacional<br>
                 ccoronel@fercoadvancededucation.com<br>
                 Telf: +593 995 11 35 49<br>
                 Whatsapp +34 655 25 56 95<br>
                 www.fercoadvancededucation.com<br>
-                <img src='{$logoUrl}' alt='FERCO Logo' style='width:100px;'>
+                <img src='{$logoUrl}' alt='FERCO Logo' style='width:200px;'>
             </p>
         </body>
         </html>
