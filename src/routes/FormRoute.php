@@ -13,5 +13,6 @@ $routes = [
     'POST /forms' => ['FormController', 'create'],
     'PUT /forms/{id}' => ['FormController', 'update'],
     'DELETE /forms/{id}' => ['FormController', 'delete'],
+    'POST /forms/{id}/send-email' => ['FormController', 'sendEmailForm'],
 ];
 

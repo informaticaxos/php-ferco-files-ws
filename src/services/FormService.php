@@ -138,4 +138,29 @@ class FormService
         $this->repository->delete($id);
         return true;
     }
+
+    /**
+     * Envía un email con el enlace del form
+     *
+     * @param int $id
+     * @return bool
+     */
+    public function sendEmailForm($id)
+    {
+        $form = $this->repository->findById($id);
+        if (!$form || empty($form['email'])) {
+            return false;
+        }
+
+        $to = $form['email'];
+        $subject = 'Enlace para subir documentos - FERCO ADVANCED EDUCATION';
+        $link = 'https://fercoadvancededucation.com/php-ferco-files-ws/up-file/index.html?id_form=' . $id;
+        $message = "Hola {$form['name']},\n\nAquí se encuentra tu enlace para que puedas subir los documentos solicitados por FERCO ADVANCED EDUCATION:\n\n{$link}\n\nSaludos,\nEquipo de FERCO ADVANCED EDUCATION";
+
+        $headers = 'From: no-reply@fercoadvancededucation.com' . "\r\n" .
+                   'Reply-To: no-reply@fercoadvancededucation.com' . "\r\n" .
+                   'X-Mailer: PHP/' . phpversion();
+
+        return mail($to, $subject, $message, $headers);
+    }
 }

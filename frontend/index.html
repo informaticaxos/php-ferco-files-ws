@@ -545,7 +545,7 @@
                     var statusIcon = form.status === 1 ? '<i class="fas fa-check-circle text-success"></i>' : '<i class="fas fa-exclamation-triangle text-warning"></i>';
                     var statusDisplay = statusIcon + ' ' + statusText;
                     var fileCount = form.fileCount || 0;
-                    table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + (form.phone || '') + '</td><td>' + (form.country || '') + '</td><td>' + (form.email || '') + '</td><td>' + statusDisplay + '</td><td class="text-center">' + fileCount + '</td><td class="text-start"><div class="d-flex flex-column gap-1"><button class="btn btn-warning btn-xs" onclick="openEditFormModal(' + form.id_form + ', \'' + form.name.replace(/'/g, "\\'") + '\', \'' + form.date + '\', \'' + (form.phone || '') + '\', \'' + (form.country || '') + '\', \'' + (form.email || '') + '\')"><i class="fas fa-edit"></i> Edit</button><button class="btn btn-info btn-xs" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i> Assign File</button><button class="btn btn-secondary btn-xs" onclick="viewFilesModal(' + form.id_form + ')"><i class="fas fa-list"></i> Files</button><button class="btn btn-success btn-xs" onclick="shareFormModal(' + form.id_form + ')"><i class="fas fa-share"></i> Share</button><button class="btn btn-danger btn-xs" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i> Delete</button></div></td></tr>';
+                    table += '<tr><td>' + form.id_form + '</td><td>' + form.name + '</td><td>' + form.date + '</td><td>' + (form.phone || '') + '</td><td>' + (form.country || '') + '</td><td>' + (form.email || '') + '</td><td>' + statusDisplay + '</td><td class="text-center">' + fileCount + '</td><td class="text-start"><div class="d-flex flex-column gap-1"><button class="btn btn-warning btn-xs" onclick="openEditFormModal(' + form.id_form + ', \'' + form.name.replace(/'/g, "\\'") + '\', \'' + form.date + '\', \'' + (form.phone || '') + '\', \'' + (form.country || '') + '\', \'' + (form.email || '') + '\')"><i class="fas fa-edit"></i> Edit</button><button class="btn btn-info btn-xs" onclick="openCreateFileModal(' + form.id_form + ')"><i class="fas fa-file"></i> Assign File</button><button class="btn btn-secondary btn-xs" onclick="viewFilesModal(' + form.id_form + ')"><i class="fas fa-list"></i> Files</button><button class="btn btn-success btn-xs" onclick="shareFormModal(' + form.id_form + ')"><i class="fas fa-share"></i> Share</button><button class="btn btn-primary btn-xs" onclick="sendEmailForm(' + form.id_form + ')"><i class="fas fa-envelope"></i> Send Email</button><button class="btn btn-danger btn-xs" onclick="deleteForm(' + form.id_form + ')"><i class="fas fa-trash"></i> Delete</button></div></td></tr>';
                 });
                 table += '</tbody></table>';
                 $('#formularios-table').html(table);
@@ -1081,6 +1081,41 @@
                     });
                 }
             });
+
+            // Send email form
+            window.sendEmailForm = function(id) {
+                Swal.fire({
+                    title: '¿Enviar email?',
+                    text: 'Se enviará un email con el enlace del formulario.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#007bff',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sí, enviar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: 'https://fercoadvancededucation.com/php-ferco-files-ws/forms/' + id + '/send-email',
+                            method: 'POST',
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: response.status === 1 ? 'success' : 'error',
+                                    title: response.status === 1 ? 'Enviado' : 'Error',
+                                    text: response.message
+                                });
+                            },
+                            error: function() {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Error de conexión.'
+                                });
+                            }
+                        });
+                    }
+                });
+            };
 
             // Delete user
             window.deleteUser = function(id) {

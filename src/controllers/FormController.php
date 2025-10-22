@@ -98,6 +98,21 @@ class FormController
     }
 
     /**
+     * Envía un email con el enlace del form
+     *
+     * @param int $id
+     */
+    public function sendEmailForm($id)
+    {
+        $result = $this->service->sendEmailForm($id);
+        if ($result) {
+            $this->sendResponse(200, 1, 'Email sent successfully', null);
+        } else {
+            $this->sendResponse(500, 0, 'Failed to send email', null);
+        }
+    }
+
+    /**
      * Envía la respuesta HTTP
      *
      * @param int $httpStatus
