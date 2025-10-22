@@ -155,10 +155,35 @@ class FormService
         $to = $form['email'];
         $subject = 'Enlace para subir documentos - FERCO ADVANCED EDUCATION';
         $link = 'https://fercoadvancededucation.com/php-ferco-files-ws/up-file/index.html?id_form=' . $id;
-        $message = "Hola {$form['name']},\n\nAquí se encuentra tu enlace para que puedas subir los documentos solicitados por FERCO ADVANCED EDUCATION:\n\n{$link}\n\nSaludos,\nEquipo de FERCO ADVANCED EDUCATION";
+        $logoUrl = 'https://fercoadvancededucation.com/data/logo%20ferco%20normal.png';
+
+        $message = "
+        <html>
+        <head>
+            <title>Email from FERCO ADVANCED EDUCATION</title>
+        </head>
+        <body>
+            <img src='{$logoUrl}' alt='FERCO Logo' style='width:200px;'>
+            <p>Hola {$form['name']},</p>
+            <p>Aquí se encuentra tu enlace para que puedas subir los documentos solicitados por FERCO ADVANCED EDUCATION:</p>
+            <p><a href='{$link}'>{$link}</a></p>
+            <p>Saludos,<br>Equipo de FERCO ADVANCED EDUCATION</p>
+            <p>
+                CORONEL CARDENAS CHRISTIAN FERNANDO<br>
+                Asesora de Vinculación Internacional<br>
+                ccoronel@fercoadvancededucation.com<br>
+                Telf: +593 995 11 35 49<br>
+                Whatsapp +34 655 25 56 95<br>
+                www.fercoadvancededucation.com<br>
+                <img src='{$logoUrl}' alt='FERCO Logo' style='width:100px;'>
+            </p>
+        </body>
+        </html>
+        ";
 
         $headers = 'From: no-reply@fercoadvancededucation.com' . "\r\n" .
                    'Reply-To: no-reply@fercoadvancededucation.com' . "\r\n" .
+                   'Content-Type: text/html; charset=UTF-8' . "\r\n" .
                    'X-Mailer: PHP/' . phpversion();
 
         return mail($to, $subject, $message, $headers);
