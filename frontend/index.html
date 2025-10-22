@@ -459,13 +459,19 @@
             $(document).on('change', '#filterCountry', function() {
                 renderTable();
             });
+            $(document).on('change', '#filterDateFrom', function() {
+                renderTable();
+            });
+            $(document).on('change', '#filterDateTo', function() {
+                renderTable();
+            });
             $(document).on('click', '#refreshBtn', function() {
                 loadFormularios();
             });
 
             // Load formularios
             function loadFormularios() {
-                $('#content-area').html('<h2>Formularios</h2><div class="d-flex justify-content-between mb-3"><div class="d-flex"><input type="text" id="searchName" class="form-control form-control-sm me-2" placeholder="Buscar por nombre"><select id="filterStatus" class="form-select form-select-sm me-2"><option value="">Todos los estados</option><option value="1">Completado</option><option value="0">Pendiente</option></select><select id="filterCountry" class="form-select form-select-sm me-2"><option value="">Todos los países</option></select></div><div><button id="refreshBtn" class="btn btn-secondary btn-sm"><i class="fas fa-sync"></i> Actualizar</button><button type="button" class="btn btn-outline-dark btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#createFormModal"><i class="fas fa-file-plus"></i> Nuevo</button></div></div><div id="formularios-table" class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Cargando...</span></div></div>');
+                $('#content-area').html('<h2>Formularios</h2><div class="d-flex justify-content-between mb-3"><div class="d-flex"><input type="text" id="searchName" class="form-control form-control-sm me-2" placeholder="Buscar por nombre"><select id="filterStatus" class="form-select form-select-sm me-2"><option value="">Todos los estados</option><option value="1">Completado</option><option value="0">Pendiente</option></select><select id="filterCountry" class="form-select form-select-sm me-2"><option value="">Todos los países</option></select><input type="date" id="filterDateFrom" class="form-control form-control-sm me-2" placeholder="Fecha desde"><input type="date" id="filterDateTo" class="form-control form-control-sm me-2" placeholder="Fecha hasta"></div><div><button id="refreshBtn" class="btn btn-secondary btn-sm"><i class="fas fa-sync"></i> Actualizar</button><button type="button" class="btn btn-outline-dark btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#createFormModal"><i class="fas fa-file-plus"></i> Nuevo</button></div></div><div id="formularios-table" class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Cargando...</span></div></div>');
                 $.ajax({
                     url: 'https://fercoadvancededucation.com/php-ferco-files-ws/forms',
                     method: 'GET',
@@ -533,11 +539,16 @@
                 var searchTerm = $('#searchName').val().toLowerCase();
                 var statusFilter = $('#filterStatus').val();
                 var countryFilter = $('#filterCountry').val();
+                var dateFrom = $('#filterDateFrom').val();
+                var dateTo = $('#filterDateTo').val();
                 var filteredData = formsData.filter(function(form) {
                     var matchesSearch = form.name.toLowerCase().includes(searchTerm);
                     var matchesStatus = statusFilter === '' || form.status.toString() === statusFilter;
                     var matchesCountry = countryFilter === '' || form.country === countryFilter;
-                    return matchesSearch && matchesStatus && matchesCountry;
+                    var matchesDate = true;
+                    if (dateFrom && form.date < dateFrom) matchesDate = false;
+                    if (dateTo && form.date > dateTo) matchesDate = false;
+                    return matchesSearch && matchesStatus && matchesCountry && matchesDate;
                 });
                 var table = '<table class="table table-striped"><thead><tr><th>ID</th><th>Nombre</th><th>Fecha</th><th>Teléfono</th><th>País</th><th>Email</th><th>Estado</th><th>Archivos</th><th>Acciones</th></tr></thead><tbody>';
                 filteredData.forEach(function(form) {
