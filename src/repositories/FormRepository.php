@@ -26,7 +26,7 @@ class FormRepository
      */
     public function findAll()
     {
-        $stmt = $this->pdo->query("SELECT * FROM forms");
+        $stmt = $this->pdo->query("SELECT * FROM forms ORDER BY id_form DESC");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
