@@ -138,6 +138,11 @@
                                 <i class="fas fa-users"></i> Usuarios
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="pagos">
+                                <i class="fas fa-credit-card"></i> PAGOS
+                            </a>
+                        </li>
                         <!-- Add more menu items here if needed -->
                     </ul>
                 </div>
@@ -159,6 +164,11 @@
                         <li class="nav-item">
                             <a class="nav-link" href="#" data-section="usuarios">
                                 <i class="fas fa-users"></i> Usuarios
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="pagos">
+                                <i class="fas fa-credit-card"></i> PAGOS
                             </a>
                         </li>
                         <!-- Add more menu items here if needed -->
@@ -446,6 +456,8 @@
                     loadFormularios();
                 } else if (section === 'usuarios') {
                     loadUsuarios();
+                } else if (section === 'pagos') {
+                    loadPagos();
                 }
             }
 
@@ -520,6 +532,26 @@
                     },
                     error: function() {
                         $('#usuarios-table').html('<p>Error de conexión.</p>');
+                    }
+                });
+            }
+
+            // Load pagos
+            function loadPagos() {
+                $('#content-area').html('<h2>Pagos</h2><div class="d-flex justify-content-between mb-3"><div class="d-flex"><input type="text" id="searchPago" class="form-control form-control-sm me-2" placeholder="Buscar por referencia"></div><div><button id="refreshPagosBtn" class="btn btn-secondary btn-sm"><i class="fas fa-sync"></i> Actualizar</button></div></div><div id="pagos-table" class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Cargando...</span></div></div>');
+                $.ajax({
+                    url: 'https://fercoadvancededucation.com/php-ferco-files-ws/pagos',
+                    method: 'GET',
+                    success: function(response) {
+                        if (response.status === 1) {
+                            pagosData = response.data; // Store the data
+                            renderPagosTable();
+                        } else {
+                            $('#pagos-table').html('<p>Error al cargar pagos: ' + response.message + '</p>');
+                        }
+                    },
+                    error: function() {
+                        $('#pagos-table').html('<p>Error de conexión.</p>');
                     }
                 });
             }
@@ -934,6 +966,14 @@
                 loadUsuarios();
             });
 
+            // Event listeners for pagos search and refresh
+            $(document).on('input', '#searchPago', function() {
+                renderPagosTable();
+            });
+            $(document).on('click', '#refreshPagosBtn', function() {
+                loadPagos();
+            });
+
             // Render users table
             function renderUsersTable() {
                 var searchTerm = $('#searchUserName').val().toLowerCase();
@@ -949,6 +989,20 @@
                 });
                 table += '</tbody></table>';
                 $('#usuarios-table').html(table);
+            }
+
+            // Render pagos table
+            function renderPagosTable() {
+                var searchTerm = $('#searchPago').val().toLowerCase();
+                var filteredData = pagosData.filter(function(pago) {
+                    return pago.reference.toLowerCase().includes(searchTerm);
+                });
+                var table = '<table class="table table-striped"><thead><tr><th>ID</th><th>Referencia</th><th>Monto</th><th>Fecha</th></tr></thead><tbody>';
+                filteredData.forEach(function(pago) {
+                    table += '<tr><td>' + pago.id_pago + '</td><td>' + pago.reference + '</td><td>' + pago.amount + '</td><td>' + pago.date + '</td></tr>';
+                });
+                table += '</tbody></table>';
+                $('#pagos-table').html(table);
             }
 
             // Save new user
